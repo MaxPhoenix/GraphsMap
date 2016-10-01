@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="libreria">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/librerias/junit-4.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/librerias/JMapViewer.jar!/" />
+      <root url="jar://$PROJECT_DIR$/librerias/java-json.jar!/" />
+      <root url="jar://$PROJECT_DIR$/librerias/hamcrest-core-1.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/librerias/gson-2.3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/librerias/java-json.jar!/" />
+    </SOURCES>
+  </library>
+</component>
