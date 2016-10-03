@@ -1,54 +1,47 @@
 package gui;
 
+
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class MainForm
-{
+public class MainForm {
 	private static FileManager m;
 	private JFrame frame;
 	private JMapViewer miMapa;
 
 
-    public MainForm() {
+	public MainForm() {
 
-        m = new FileManager("instancia1.json");
-        if (m.getCordinates().size() > 2 && m.getCordinates() != null) {
-            m.getCordinates().forEach(System.out::println);
-              //ACA CRASHEA SI NO RECIBE NADA DEL ARCHIVO
-        }
-          //ACA NO CRASHEA!!!, AUN SI NO RECIBIO NADA DEL ARCHIVO!!!!,aca debe quedar
-        initialize();
-    }
+		m = new FileManager("instancia1.json");
+		if (m.getCordinates().size() > 2 && m.getCordinates() != null) {
+			m.getCordinates().forEach(System.out::println);
+			//ACA CRASHEA SI NO RECIBE NADA DEL ARCHIVO
+		}
+		//ACA NO CRASHEA!!!, AUN SI NO RECIBIO NADA DEL ARCHIVO!!!!,aca debe quedar
+		initialize();
+	}
 
 
-    public static void main(String[] args)
-	{
-	
-		EventQueue.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-                    MainForm window = new MainForm();
-                    window.frame.setVisible(true);
-				}
-				catch (Exception e)
-				{
+	public static void main(String[] args) {
+
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					MainForm window = new MainForm();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
 
-	private void initialize()
-	{
+	private void initialize() {
 		GrafoJmap JGrafo = new GrafoJmap(m);
 
-        frame = new JFrame();
+		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -58,7 +51,7 @@ public class MainForm
 
 
 		JGrafo.render(miMapa);
-		
+
 		frame.setContentPane(miMapa);
 	}
 }

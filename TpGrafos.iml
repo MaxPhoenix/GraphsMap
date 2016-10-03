@@ -18,5 +18,10 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="libreria" level="project" />
+    <orderEntry type="library" name="gson-2.3.1" level="project" />
+    <orderEntry type="library" name="hamcrest-core-1.3" level="project" />
+    <orderEntry type="library" name="java-json" level="project" />
+    <orderEntry type="library" name="JMapViewer" level="project" />
+    <orderEntry type="library" name="junit-4.12" level="project" />
   </component>
 </module>
