@@ -1,11 +1,12 @@
 package gui;
-
+import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Created by Max on 10/2/2016.
@@ -22,7 +23,7 @@ public class Menu extends JFrame implements Runnable , ActionListener{
     private int width = 1024, height = width / 12 * 9;
     private boolean menu = true; //para que no sea expandible la ventana
     private GrafoJmap JGrafo;
-
+    private ArrayList<Coordinate> fileCoordinates;
 
     public Menu() {
         try {
@@ -180,12 +181,48 @@ public class Menu extends JFrame implements Runnable , ActionListener{
             }
         }
         if(e.getSource() == createInstance){
-           int cant =  Integer.parseInt(JOptionPane.showInputDialog(("Cuantas coordenadas quiere?")));
+            //cartel para ingreso de coordenadas
+            String nombre = JOptionPane.showInputDialog(this,"nombre del archivo? se guardara en "+ path.getAbsolutePath());
+            int cant = Integer.parseInt(JOptionPane.showInputDialog(this,"cuantas ingresas?"));
+            ArrayList<Coordenada> userCoordinates = new ArrayList<Coordenada>(cant);
             for(int i = 0; i< cant ; i++){
-                double cant1 =  Double.parseDouble(JOptionPane.showInputDialog(("latitud ")));
-                double cant2 =  Double.parseDouble(JOptionPane.showInputDialog(("longitud ")));
+                Coordenada c = getUserCoordinate();
+                while(c == null){
+                    JOptionPane.showMessageDialog(this, "Solo puede ingresar numeros como coordenadas", "Error", JOptionPane.ERROR_MESSAGE);
+                    c = getUserCoordinate();
+                }
+                userCoordinates.add(c);
             }
 
+            //arreglo de coordinates para guradar
+            fileCoordinates = new ArrayList<Coordinate>(cant);
+            for(Coordenada cor: userCoordinates)
+                fileCoordinates.add(new Coordinate(cor.getLat(),cor.getLon()));
+
+            //crea un filemanager que guarda como coordinates el arreglo de coordenada creado arriba
+            m = new FileManager(path.getAbsolutePath());
+            m.setCordinates(fileCoordinates);
+            //cambie la funcion store coordinates para que guarde un directorio
+            m.storeCoordinates(path.getAbsolutePath(),nombre+".json");
+
+            //aca se guarda el archivo en el home directory de la computadora del usuario
+            String fileDir="", opcion="";
+            File dir = new File(path.getAbsolutePath());
+            if(dir.isDirectory()){
+                for(File f: dir.listFiles()){
+                    if(f.getName().equals(nombre+".json")){
+                        fileDir =  f.getAbsolutePath();
+                    }
+                }
+                opcion = fileDir;
+            }
+
+            m = new FileManager(opcion);
+            m.setCordinates(m.retrieveCoordinates(opcion));
+            JGrafo = new GrafoJmap(m);
+            turnInvisible(start,createInstance,files);
+            JGrafo.render(miMapa);
+            setContentPane(miMapa);
         }
     }
 
@@ -194,4 +231,44 @@ public class Menu extends JFrame implements Runnable , ActionListener{
         b.setVisible(false);
         c.setVisible(false);
     }
+
+
+    private Coordenada getUserCoordinate() {
+        JTextField field1 = new JTextField();
+        JTextField field2 = new JTextField();
+        Object[] message = {"Latitud:", field1, "Longitud:", field2};
+        String value1 = "" , value2 = "";
+        int option = JOptionPane.showConfirmDialog(this, message, "Enter all your values", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            value1 = field1.getText();
+            value2 = field2.getText();
+            // if(!onlyNumbers(value1) || !onlyNumbers(value2) || value1.equals("") || value2.equals("")){
+            //     return null;
+        }
+        //
+        // else{
+        //    return null;
+        // }
+        //boolean numbers1 = onlyNumbers(value1);
+        //boolean numbers2 = onlyNumbers(value2);
+        //if (numbers1 && numbers2) {
+        double lat = Double.parseDouble(value1);
+        double lon = Double.parseDouble(value2);
+        return new Coordenada(lat, lon);
+        // }
+
+
+    }
+
+    private static boolean onlyNumbers(String s){
+        String numbers = "-.123456789";
+        for(int i = 0 ; i < s.length(); i++){
+            char c = s.charAt(i);
+            if(numbers.indexOf(c) == -1){
+                System.out.println(s.charAt(i));
+                return false;}
+        }
+        return true;
+    }
+
 }

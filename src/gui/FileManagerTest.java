@@ -1,6 +1,5 @@
 package gui;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 
@@ -20,12 +19,7 @@ public class FileManagerTest {
         }
     }
 
-    @Ignore
-    public void storeCoordinates() throws Exception {
-        FileManager m = manager();
-        m.storeCoordinates("prueba.txt");
 
-    }
 
     private FileManager manager(){
         FileManager m = new FileManager("prueba.txt");
