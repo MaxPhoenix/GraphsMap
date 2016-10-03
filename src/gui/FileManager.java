@@ -18,7 +18,24 @@ public class FileManager implements Serializable {
     private ArrayList<Coordinate> cor = new ArrayList<>();
 
 
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public ArrayList<Coordinate> getCor() {
+        return cor;
+    }
+
+    public void setCor(ArrayList<Coordinate> cor) {
+        this.cor = cor;
+    }
+
     public FileManager(String fileName) {
+
         nombre = fileName;
     }
 
@@ -46,7 +63,36 @@ public class FileManager implements Serializable {
             e.printStackTrace();
             System.out.println("No se encuentra el archivo especificado");
         }
+        cor=coordenadas;
+        return coordenadas;
+    }
 
+
+    public ArrayList<Coordinate> retrieveCoordinates() {
+        Gson gson = new Gson();
+        ArrayList<Coordinate> coordenadas = new ArrayList<>();
+        File f = new File(this.nombre);
+        try{
+            if(f.exists() == true ) {
+                Type tipoCoordenada = new TypeToken<List<Coordenada>>() {}.getType();
+                List<Coordenada> coordenada = gson.fromJson(new FileReader(this.nombre), tipoCoordenada);
+                if (coordenada == null)
+                    System.out.println("Archivo vacio, creando uno nuevo...");
+                else
+                    for (Coordenada c : coordenada)
+                        coordenadas.add(new Coordinate(c.getLat(), c.getLon()));
+            }
+            else{
+                //ESTO ES PARA QUE, SI EL ARCHIVO NO EXISTE, SE CREA UNO VACIO, QUE DESPUES SE MODIFICA SEGUN LO QUE GUARDE EL USUARIO
+                BufferedWriter br = new BufferedWriter (new FileWriter(this.nombre));
+                br.close();
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+            System.out.println("No se encuentra el archivo especificado");
+        }
+        cor=coordenadas;
         return coordenadas;
     }
 
