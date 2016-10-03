@@ -174,6 +174,7 @@ public class Menu extends JFrame implements Runnable , ActionListener{
 
                 }
                 m = new FileManager(opcion);
+                m.setCordinates(m.retrieveCoordinates(opcion));
                 JGrafo = new GrafoJmap(m);
                 turnInvisible(start,createInstance,files);
                 JGrafo.render(miMapa);
