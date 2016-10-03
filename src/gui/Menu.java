@@ -3,15 +3,17 @@ package gui;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
  * Created by Max on 10/2/2016.
  */
-public class Menu extends JFrame implements Runnable {
+public class Menu extends JFrame implements Runnable , ActionListener{
 
     private JComboBox files;
-    private JButton start, exit, createInstance, selectInstance, saveInstance;
+    private JButton start, exit, createInstance, saveInstance;
     private JMapViewer miMapa;
     private FileManager m;
     private boolean running = false;
@@ -19,6 +21,8 @@ public class Menu extends JFrame implements Runnable {
     private File path, directoryProject;
     private int width = 1024, height = width / 12 * 9;
     private boolean menu = true; //para que no sea expandible la ventana
+    private GrafoJmap JGrafo;
+
 
     public Menu() {
         try {
@@ -34,7 +38,7 @@ public class Menu extends JFrame implements Runnable {
             //aca se crea una carpeta en el home directory del usuario para guardar sus propias instancias
             String separator = File.separator;
             String currentUsersHomeDir = System.getProperty("user.home"); //C\Users\ "Nombre del usuario
-            path = new File(currentUsersHomeDir+separator+"Archivos");
+            path = new File(currentUsersHomeDir+separator+"Archivos User");
             if (!path.exists()) {
                 path.mkdir();   //crea el directorio de archivos
             }
@@ -93,11 +97,9 @@ public class Menu extends JFrame implements Runnable {
 
 
     public void initialize() {
-        //GrafoJmap JGrafo = new GrafoJmap(m);
 
-
-        new JFrame();
-        setBounds(100, 100, 800, 600);
+        new JFrame("Soy el mapa");
+        setBounds(100, 100, width,height);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
 
@@ -109,21 +111,36 @@ public class Menu extends JFrame implements Runnable {
         miMapa = new JMapViewer();
         miMapa.setZoomContolsVisible(false);
         miMapa.setDisplayPositionByLatLon(-34.521, -58.7008, 11);
-
-
-        //JGrafo.render(miMapa);
-
         setContentPane(miMapa);
 
+
+        start = new JButton("Start");
+        start.setBounds(width-200,height-200,150,50);
+        start.addActionListener(this);
+        add(start);
+
+        exit= new JButton("Exit");
+        exit.setBounds(width-200,height-100,150,50);
+        exit.addActionListener(this);
+        add(exit);
+
+        createInstance = new JButton("Crear nueva instancia");
+        createInstance.setBounds(width /4,height/3,400,50);
+        createInstance.addActionListener(this);
+        add(createInstance);
+
+
         files = new JComboBox();
-        files.setBounds(width -500,height-500,200,50);
-        
+        files.setBounds(width /4,height/2,400,50);
+        files.addActionListener(this);
         addFilestoComboBox();
         add(files);
 
         setVisible(true);
 
     }
+
+
 
     private void addFilestoComboBox() {
         files.addItem("(Seleccione una instancia)");
@@ -138,5 +155,32 @@ public class Menu extends JFrame implements Runnable {
     }
 
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == start){
+            menu = false;
+            String opcion = (String) files.getSelectedItem();
+            int opIndex= files.getSelectedIndex();
+            String fileDir ="";
+            if(opIndex > 0 && opIndex < 6) {
+                File dir = new File("Archivos");
+                if(dir.isDirectory()){
+                    for(File f: dir.listFiles()){
+                        if(f.getName().equals(opcion))
+                            fileDir =  f.getAbsolutePath();
+                    }
+                    opcion = fileDir;
 
+                }
+                m = new FileManager(opcion);
+                JGrafo = new GrafoJmap(m);
+                start.setVisible(false);
+                createInstance.setVisible(false);
+                files.setVisible(false);
+                JGrafo.render(miMapa);
+                setContentPane(miMapa);
+            }
+
+        }
+    }
 }
