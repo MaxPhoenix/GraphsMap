@@ -1,6 +1,7 @@
 package gui;
 
 import org.junit.Ignore;
+import org.junit.Test;
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 
 import java.util.ArrayList;
@@ -10,10 +11,13 @@ import java.util.ArrayList;
  */
 public class FileManagerTest {
 
-
-    public static void retrieveCoordinates() {
-        FileManager m = new FileManager("prueba.txt");
-        m.getCordinates().forEach(System.out::println);
+    @Test
+    public void retrieveCoordinates() {
+        FileManager m = new FileManager("Archivos/instanciaTest.json");
+        String test="";
+        for (Coordinate cor: m.getCordinates()){
+            test+=cor;
+        }
     }
 
     @Ignore

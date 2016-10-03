@@ -20,6 +20,19 @@ public class GrafoJmap {
     public ArrayList<Coordinate> coordenadas = new ArrayList<>();
     FileManager f;
     private ArrayList<Arista> aristasOriginal = new ArrayList<>();
+
+    public ArrayList<Coordinate> getCoordenadas() {
+        return coordenadas;
+    }
+
+    public ArrayList<Arista> getAristas() {
+        return aristas;
+    }
+
+    public GrafoPesado getGp() {
+        return gp;
+    }
+
     private ArrayList<Arista> aristas;
     private GrafoPesado gp;
     
@@ -33,9 +46,30 @@ public class GrafoJmap {
         gp = toGrafo(coordenadas);
         gp = Algoritmos.AGM(gp);
        // gp = Algoritmos.Clusters(gp);
-        aristas = toArista(gp);
+        toArista(gp);
         aristasOriginal = aristas;
        //----------------------------------------------------------------------------------
+    }
+
+    public GrafoJmap(FileManager f,boolean test) {
+        this.f = f;
+        this.coordenadas = f.getCordinates();
+
+        //----------------------------------------------------------------------------------------
+        //ESTO CRASHEA SI EL ARCHIVO ESTA VACIO, NO ES ESA LA IDEA, ES LA FUNCION CLUSTERS EL TEMA CUANDO RECIBE UN ARCHIVO VACIO.
+        // LA IDEA ORIGINAL DEL TP ES QUE NO SE HAGAN CLUSTERS NI BIEN SE ABRE EL PROGRAMA, SINO DESPUES
+        //LO QUE PUSIMOS ACA ES DE PRUEBA NOMAS
+
+        gp = toGrafo(coordenadas);
+      if(!test) {
+
+
+          gp = Algoritmos.AGM(gp);
+          // gp = Algoritmos.Clusters(gp);
+          toArista(gp);
+          aristasOriginal = aristas;
+          //----------------------------------------------------------------------------------
+      }
     }
 
     public static float distFrom(Coordinate cor1, Coordinate cor2) {
@@ -63,7 +97,7 @@ public class GrafoJmap {
             v.render(miMapa);
     }
 
-    public ArrayList<Arista> toArista(GrafoPesado gp) {
+    public void toArista(GrafoPesado gp) {
         ArrayList<Arista> ret = new ArrayList<>(gp.vertices());
 
         for (int i = 0; i < gp.vertices(); i++) {
@@ -77,7 +111,8 @@ public class GrafoJmap {
                     ret.add(arista);
             }
         }
-        return ret;
+
+        this.aristas=ret;
     }
 
     public GrafoPesado toGrafo(ArrayList<Coordinate> list) {
