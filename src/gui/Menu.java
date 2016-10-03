@@ -225,7 +225,21 @@ public class Menu extends JFrame implements Runnable , ActionListener{
             JGrafo.render(miMapa);
             setContentPane(miMapa);
         }
+
+        if(e.getSource()==exit){
+            miMapa.removeAllMapMarkers();
+            miMapa.removeAllMapPolygons();
+            turnVisible(start,createInstance,files);}
+
+
     }
+
+    private void turnVisible(JButton a, JButton b,JComboBox c){
+        a.setVisible(true);
+        b.setVisible(true);
+        c.setVisible(true);
+    }
+
 
     private void turnInvisible(JButton a, JButton b,JComboBox c){
         a.setVisible(false);
@@ -256,7 +270,7 @@ public class Menu extends JFrame implements Runnable , ActionListener{
         double lat = Double.parseDouble(value1);
         double lon = Double.parseDouble(value2);
         return new Coordenada(lat, lon);
-        // }
+
 
 
     }

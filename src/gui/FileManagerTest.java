@@ -7,10 +7,13 @@ import java.io.File;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 /**
  * Created by Max on 9/29/2016.
  */
 public class FileManagerTest {
+
 
     @Test
     public void retrieveCoordinates() {
@@ -46,18 +49,32 @@ public class FileManagerTest {
 
         assertEquals(coordenadas.toString(),test.toString());
 
-
-        delete("Archivos/test.json");
-    }
-
-    void delete(String filename) {
-        try {
-            File file = new File(filename);
+        /*try {
+            File file = new File("Archivos/test.json");
             file.delete();
         } catch (Exception e) {
             System.err.format("%s: no such" + " file or directory");
         }
 
+        File file = new File("Archivos/test.json");
+        assertFalse(file.exists());
+
+*/
     }
+
+    @Test
+    public void delete() {
+
+        try {
+            File file = new File("Archivos/test.json");
+            file.delete();
+        } catch (Exception e) {
+            System.err.format("%s: no such" + " file or directory");
+        }
+
+        File file = new File("Archivos/test.json");
+        assertFalse(file.exists());
+    }
+
     
 }
