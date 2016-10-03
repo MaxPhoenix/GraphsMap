@@ -174,13 +174,24 @@ public class Menu extends JFrame implements Runnable , ActionListener{
                 }
                 m = new FileManager(opcion);
                 JGrafo = new GrafoJmap(m);
-                start.setVisible(false);
-                createInstance.setVisible(false);
-                files.setVisible(false);
+                turnInvisible(start,createInstance,files);
                 JGrafo.render(miMapa);
                 setContentPane(miMapa);
             }
+        }
+        if(e.getSource() == createInstance){
+           int cant =  Integer.parseInt(JOptionPane.showInputDialog(("Cuantas coordenadas quiere?")));
+            for(int i = 0; i< cant ; i++){
+                double cant1 =  Double.parseDouble(JOptionPane.showInputDialog(("latitud ")));
+                double cant2 =  Double.parseDouble(JOptionPane.showInputDialog(("longitud ")));
+            }
 
         }
+    }
+
+    private void turnInvisible(JButton a, JButton b,JComboBox c){
+        a.setVisible(false);
+        b.setVisible(false);
+        c.setVisible(false);
     }
 }
