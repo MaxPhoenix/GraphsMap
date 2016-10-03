@@ -14,7 +14,7 @@ public class FileManagerTest {
 
     @Test
     public void retrieveCoordinates() {
-        FileManager m = new FileManager("Archivos\\instanciaTest.json");
+        FileManager m = new FileManager("Archivos/instanciaTest.json");
         m.retrieveCoordinates();
         String test="";
         String bkp="Coordinate[-34.52133782929332, -58.70068073272705]"+
@@ -37,18 +37,17 @@ public class FileManagerTest {
         coordenadas.add(new Coordinate(-34.559, -58.721));
         coordenadas.add(new Coordinate(-34.569, -58.725));
 
-        FileManager m = new FileManager("Archivos"+File.separator+"test.json");
+        FileManager m = new FileManager("Archivos/test.json");
         m.setCor(coordenadas);
         m.storeCoordinates("Archivos","test.json");
 
-        m = new FileManager("Archivos"+File.separator+"test.json");
-        ArrayList<Coordinate> test=m.retrieveCoordinates("test.json");
+        m = new FileManager("Archivos/test.json");
+        ArrayList<Coordinate> test=m.retrieveCoordinates("Archivos/test.json");
 
         assertEquals(coordenadas.toString(),test.toString());
 
 
-        delete("Archivos"+File.separator+"test.json");
-
+        delete("Archivos/test.json");
     }
 
     void delete(String filename) {
