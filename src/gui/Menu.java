@@ -1,8 +1,10 @@
 package gui;
+
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -11,19 +13,21 @@ import java.util.ArrayList;
 /**
  * Created by Max on 10/2/2016.
  */
-public class Menu extends JFrame implements Runnable , ActionListener{
+public class Menu extends JMapViewer implements ActionListener{
 
-    private JComboBox files;
+    private  JFrame frame;
+    private JComboBox fileCombo;
     private JButton start, exit, createInstance, saveInstance;
     private JMapViewer miMapa;
     private FileManager m;
     private boolean running = false;
     private Thread thread;
-    private File path, directoryProject;
+    private File userFolder, projectDirectory;
     private int width = 1024, height = width / 12 * 9;
     private boolean menu = true; //para que no sea expandible la ventana
     private GrafoJmap JGrafo;
     private ArrayList<Coordinate> fileCoordinates;
+    private int projectDirectorySize = 0;
 
     public Menu() {
         try {
@@ -31,124 +35,89 @@ public class Menu extends JFrame implements Runnable , ActionListener{
                     UIManager.getSystemLookAndFeelClassName());
 
             //esta es la carpeta con istancias del proyecto
-            directoryProject = new File("Archivos");
-            if (!directoryProject.exists()) {
-                directoryProject.mkdir();   //crea el directorio de archivos
+            projectDirectory = new File("Archivos");
+            if (!projectDirectory.exists()) {
+                projectDirectory.mkdir();   //crea el directorio de archivos
             }
 
             //aca se crea una carpeta en el home directory del usuario para guardar sus propias instancias
             String separator = File.separator;
             String currentUsersHomeDir = System.getProperty("user.home"); //C\Users\ "Nombre del usuario
-            path = new File(currentUsersHomeDir+separator+"Archivos User");
-            if (!path.exists()) {
-                path.mkdir();   //crea el directorio de archivos
+            userFolder = new File(currentUsersHomeDir+separator+"Archivos User");
+            if (!userFolder.exists()) {
+                userFolder.mkdir();   //crea el directorio de archivos
             }
 
         } catch (Exception e) {
         }
-        initialize();
+       initialize();
     }
 
-    @Override
-    public void run() {
-        long lastTime = System.nanoTime();
-        double amountOfTicks = 60.0;
-        double ns = 1000000000 / amountOfTicks;
-        double delta = 0;
-        long timer = System.currentTimeMillis();
-        while (running) {
-            long now = System.nanoTime();
-            delta += (now - lastTime) / ns;
-            lastTime = now;
-            while (delta >= 1) {
-                tick();
-                delta--;
-            }
 
-            if (running)
-                render();
-            if (System.currentTimeMillis() - timer > 1000) {
-                timer += 1000;
-            }
-        }
-        stop();
-    }
-
-    public synchronized void start() {
-        thread = new Thread(this);
-        thread.start();
-        running = true;
-
-    }
-
-    private synchronized void stop() {
-        try {
-            thread.join();
-            running = false;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void tick() {
-    }
-
-    public void render() {
-    }
 
 
     public void initialize() {
 
-        new JFrame("Soy el mapa");
-        setBounds(100, 100, width,height);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        getContentPane().setLayout(null);
+        frame=new JFrame("Soy el mapa");
+        frame.setBounds(100, 100, width,height);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
 
         if(menu)
-            setResizable(false);
+            frame.setResizable(false);
         else
-            setResizable(true);
+            frame.setResizable(true);
 
         miMapa = new JMapViewer();
         miMapa.setZoomContolsVisible(false);
         miMapa.setDisplayPositionByLatLon(-34.521, -58.7008, 11);
-        setContentPane(miMapa);
+        frame.setContentPane(miMapa);
 
 
         start = new JButton("Start");
         start.setBounds(width-200,height-200,150,50);
         start.addActionListener(this);
-        add(start);
+        frame.add(start);
 
         exit= new JButton("Exit");
         exit.setBounds(width-200,height-100,150,50);
         exit.addActionListener(this);
-        add(exit);
+        frame.add(exit);
 
         createInstance = new JButton("Crear nueva instancia");
         createInstance.setBounds(width /4,height/3,400,50);
         createInstance.addActionListener(this);
-        add(createInstance);
+        frame. add(createInstance);
 
 
-        files = new JComboBox();
-        files.setBounds(width /4,height/2,400,50);
-        files.addActionListener(this);
+        fileCombo = new JComboBox();
+        fileCombo.setBounds(width /4,height/2,400,50);
+        fileCombo.addActionListener(this);
         addFilestoComboBox();
-        add(files);
+        frame.add(fileCombo);
 
-        setVisible(true);
+        frame.setVisible(true);
+
+
+
 
     }
-
-
+    @Override
+    protected void paintComponent(Graphics g){
+        super.paintComponent(g);
+        g.setColor(Color.BLACK);
+        g.drawRect(100,100,1000000,100000);
+    }
 
     private void addFilestoComboBox() {
-        files.addItem("(Seleccione una instancia)");
-        for(String f : directoryProject.list())
-            files.addItem(f);
-        for(String s: path.list())
-            files.addItem(s);
+        fileCombo.addItem("(Seleccione una instancia)");
+        for (String f : projectDirectory.list()) {
+            fileCombo.addItem(f);
+            projectDirectorySize++;
+        }
+        for (String s : userFolder.list()) {
+            fileCombo.addItem(s);
+        }
     }
 
     public static void main(String[] args){
@@ -159,77 +128,102 @@ public class Menu extends JFrame implements Runnable , ActionListener{
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == start){
-            menu = false;
-            String opcion = (String) files.getSelectedItem();
-            int opIndex= files.getSelectedIndex();
-            String fileDir ="";
-            if(opIndex > 0 && opIndex < 6) {
-                File dir = new File("Archivos");
-                if(dir.isDirectory()){
-                    for(File f: dir.listFiles()){
-                        if(f.getName().equals(opcion))
-                            fileDir =  f.getAbsolutePath();
-                    }
-                    opcion = fileDir;
-
-                }
-                m = new FileManager(opcion);
-                m.setCordinates(m.retrieveCoordinates(opcion));
-                JGrafo = new GrafoJmap(m);
-                turnInvisible(start,createInstance,files);
-                JGrafo.render(miMapa);
-                setContentPane(miMapa);
-            }
+            loadMap();
         }
         if(e.getSource() == createInstance){
-            //cartel para ingreso de coordenadas
-            String nombre = JOptionPane.showInputDialog(this,"nombre del archivo? se guardara en "+ path.getAbsolutePath());
-            int cant = Integer.parseInt(JOptionPane.showInputDialog(this,"cuantas ingresas?"));
-            ArrayList<Coordenada> userCoordinates = new ArrayList<Coordenada>(cant);
-            for(int i = 0; i< cant ; i++){
-                Coordenada c = getUserCoordinate();
-                while(c == null){
-                    JOptionPane.showMessageDialog(this, "Solo puede ingresar numeros como coordenadas", "Error", JOptionPane.ERROR_MESSAGE);
-                    c = getUserCoordinate();
-                }
-                userCoordinates.add(c);
-            }
-
-            //arreglo de coordinates para guradar
-            fileCoordinates = new ArrayList<Coordinate>(cant);
-            for(Coordenada cor: userCoordinates)
-                fileCoordinates.add(new Coordinate(cor.getLat(),cor.getLon()));
-
-            //crea un filemanager que guarda como coordinates el arreglo de coordenada creado arriba
-            m = new FileManager(path.getAbsolutePath());
-            m.setCordinates(fileCoordinates);
-            //cambie la funcion store coordinates para que guarde un directorio
-            m.storeCoordinates(path.getAbsolutePath(),nombre+".json");
-
-            //aca se guarda el archivo en el home directory de la computadora del usuario
-            String fileDir="", opcion="";
-            File dir = new File(path.getAbsolutePath());
-            if(dir.isDirectory()){
-                for(File f: dir.listFiles()){
-                    if(f.getName().equals(nombre+".json")){
-                        fileDir =  f.getAbsolutePath();
-                    }
-                }
-                opcion = fileDir;
-            }
-
-            m = new FileManager(opcion);
-            m.setCordinates(m.retrieveCoordinates(opcion));
-            JGrafo = new GrafoJmap(m);
-            turnInvisible(start,createInstance,files);
-            JGrafo.render(miMapa);
-            setContentPane(miMapa);
+            createMap();
         }
 
         if(e.getSource()==exit){
             miMapa.removeAllMapMarkers();
             miMapa.removeAllMapPolygons();
-            turnVisible(start,createInstance,files);}
+            turnVisible(start,createInstance, fileCombo);
+        }
+
+    }
+
+    private void createMap() {
+        //cartel para ingreso de coordenadas
+        String nombre = JOptionPane.showInputDialog(this,"nombre del archivo? se guardara en "+ userFolder.getAbsolutePath())+".json";
+        int cant = Integer.parseInt(JOptionPane.showInputDialog(this,"cuantas ingresas?"));
+        ArrayList<Coordenada> userCoordinates = new ArrayList<Coordenada>(cant);
+        for(int i = 0; i< cant ; i++){
+            Coordenada c = getUserCoordinate();
+            while(c == null){
+                JOptionPane.showMessageDialog(this, "Solo puede ingresar numeros como coordenadas", "Error", JOptionPane.ERROR_MESSAGE);
+                c = getUserCoordinate();
+            }
+            userCoordinates.add(c);
+        }
+
+        //arreglo de coordinates para guradar
+        fileCoordinates = new ArrayList<Coordinate>(cant);
+        for(Coordenada cor: userCoordinates)
+            fileCoordinates.add(new Coordinate(cor.getLat(),cor.getLon()));
+
+        //crea un filemanager que guarda como coordinates el arreglo de coordenada creado arriba
+        m = new FileManager(userFolder.getAbsolutePath()+"\\"+nombre);
+        System.out.println(userFolder.getAbsolutePath()+"\\"+nombre);
+        m.setCordinates(fileCoordinates);
+        //cambie la funcion store coordinates para que guarde un directorio
+        m.storeCoordinates();
+/*
+        //aca se guarda el archivo en el home directory de la computadora del usuario
+        String fileDir="", opcion="";
+        File dir = new File(userFolder.getAbsolutePath());
+        if(dir.isDirectory()){
+            for(File f: dir.listFiles()){
+                if(f.getName().equals(nombre)){
+                    fileDir =  f.getAbsolutePath();
+
+                }
+            }
+            opcion = fileDir;
+        }
+        System.out.println(opcion);
+        m = new FileManager(opcion);
+*/
+        m.setCordinates(m.retrieveCoordinates());
+        JGrafo = new GrafoJmap(m);
+        turnInvisible(start,createInstance, fileCombo);
+        JGrafo.render(miMapa);
+
+    }
+
+    private void loadMap() {
+        menu = false;
+        String opcion = (String) fileCombo.getSelectedItem();
+        int opIndex= fileCombo.getSelectedIndex();
+        String fileDir ="";
+        if(opIndex < projectDirectorySize-1) {
+            File dir = new File("Archivos");
+            if(dir.isDirectory()){
+                for(File f: dir.listFiles()){
+                    if(f.getName().equals(opcion))
+                        fileDir =  f.getAbsolutePath();
+                }
+                opcion = fileDir;
+            }
+        }
+        else {
+            File dir = new File(userFolder.getAbsolutePath());
+            if(dir.isDirectory()){
+                for(File f: dir.listFiles()){
+                    if(f.getName().equals(opcion)){
+                        fileDir =  f.getAbsolutePath();
+
+                    }
+                }
+                opcion = fileDir;
+            }
+        }
+            m = new FileManager(opcion);
+            m.setCordinates(m.retrieveCoordinates());
+            JGrafo = new GrafoJmap(m);
+            miMapa.setDisplayPositionByLatLon(m.getCordinates().get(0).getLat(),m.getCordinates().get(0).getLon(), 30);
+            turnInvisible(start,createInstance, fileCombo);
+
+               JGrafo.render(miMapa);
 
 
     }

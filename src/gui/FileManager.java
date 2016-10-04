@@ -94,6 +94,7 @@ public class FileManager implements Serializable {
         }
         cor=coordenadas;
         return coordenadas;
+
     }
 
 
@@ -109,6 +110,26 @@ public class FileManager implements Serializable {
 
         try{
             BufferedWriter fileWriter = new BufferedWriter(new FileWriter(dirName+File.separator+fileName));
+            fileWriter.write(coordenadas);
+            fileWriter.close();
+        }
+        catch (Exception e){
+            System.out.println("Falla en la escritura de archivos");
+        }
+
+    }
+    public void storeCoordinates() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        ArrayList<Coordenada> storage = new ArrayList<Coordenada>();
+
+        //conversion de coordinate a coordaenada
+        for(Coordinate c : this.cor)
+            storage.add(new Coordenada(c.getLat(),c.getLon()));
+
+        String coordenadas = gson.toJson(storage);  //guardado de coordenada
+
+        try{
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(this.nombre));
             fileWriter.write(coordenadas);
             fileWriter.close();
         }

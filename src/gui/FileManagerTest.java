@@ -49,17 +49,7 @@ public class FileManagerTest {
 
         assertEquals(coordenadas.toString(),test.toString());
 
-        /*try {
-            File file = new File("Archivos/test.json");
-            file.delete();
-        } catch (Exception e) {
-            System.err.format("%s: no such" + " file or directory");
-        }
 
-        File file = new File("Archivos/test.json");
-        assertFalse(file.exists());
-
-*/
     }
 
     @Test

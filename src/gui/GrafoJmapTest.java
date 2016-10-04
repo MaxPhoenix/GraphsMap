@@ -22,6 +22,7 @@ public class GrafoJmapTest {
     public void toAristaTest() {
         GrafoJmap test=instancia(true);
         GrafoJmap bkp=instancia(false);
+
         test.toArista(bkp.getGp());
 
         System.out.println("Aristas= "+test.getAristas().size()+" | "+bkp.getGp().aristas());
@@ -57,6 +58,7 @@ public class GrafoJmapTest {
 
     public GrafoJmap instancia(boolean incializada){
         FileManager f=new FileManager("Archivos/instanciaTest.json");
+        f.retrieveCoordinates();
         GrafoJmap gp=new GrafoJmap(f,incializada);
         return gp;
     }

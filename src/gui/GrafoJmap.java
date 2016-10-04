@@ -95,7 +95,7 @@ public class GrafoJmap {
         }
         for (Arista v : aristas)
             v.render(miMapa);
-    }
+}
 
     public void toArista(GrafoPesado gp) {
         ArrayList<Arista> ret = new ArrayList<>(gp.vertices());
