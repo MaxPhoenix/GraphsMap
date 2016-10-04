@@ -7,17 +7,17 @@ public class Algoritmos
 {
 	// Algoritmo de Prim
 	public static GrafoPesado AGM(GrafoPesado grafo){
-		GrafoPesado arbol = new GrafoPesado(grafo.vertices());
+		GrafoPesado GRAFO = new GrafoPesado(grafo.vertices());
 		Set<Integer> visitados = new HashSet<Integer>();
 		visitados.add(0); // Cualquiera
 		
 		for(int i=0; i<grafo.vertices()-1; ++i){
 			Arista a = menorArista(grafo, visitados); // De un amarillo a un negro
-			arbol.agregarArista(a.origen, a.destino, a.peso);
+			GRAFO.agregarArista(a.origen, a.destino, a.peso);
 			visitados.add(a.destino);
 		}
 		
-		return arbol;
+		return GRAFO;
 	}
 	
 	// Inner class

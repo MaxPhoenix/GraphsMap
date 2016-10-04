@@ -4,9 +4,12 @@ import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -97,7 +100,8 @@ public class Menu extends JMapViewer implements ActionListener{
         frame.add(fileCombo);
 
         frame.setVisible(true);
-
+      
+   
 
 
 
@@ -125,6 +129,10 @@ public class Menu extends JMapViewer implements ActionListener{
     }
 
 
+    
+    
+    
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == start){
@@ -167,22 +175,7 @@ public class Menu extends JMapViewer implements ActionListener{
         m.setCordinates(fileCoordinates);
         //cambie la funcion store coordinates para que guarde un directorio
         m.storeCoordinates();
-/*
-        //aca se guarda el archivo en el home directory de la computadora del usuario
-        String fileDir="", opcion="";
-        File dir = new File(userFolder.getAbsolutePath());
-        if(dir.isDirectory()){
-            for(File f: dir.listFiles()){
-                if(f.getName().equals(nombre)){
-                    fileDir =  f.getAbsolutePath();
 
-                }
-            }
-            opcion = fileDir;
-        }
-        System.out.println(opcion);
-        m = new FileManager(opcion);
-*/
         m.setCordinates(m.retrieveCoordinates());
         JGrafo = new GrafoJmap(m);
         turnInvisible(start,createInstance, fileCombo);
@@ -195,7 +188,7 @@ public class Menu extends JMapViewer implements ActionListener{
         String opcion = (String) fileCombo.getSelectedItem();
         int opIndex= fileCombo.getSelectedIndex();
         String fileDir ="";
-        if(opIndex < projectDirectorySize-1) {
+        if(opIndex < projectDirectorySize+1) {
             File dir = new File("Archivos");
             if(dir.isDirectory()){
                 for(File f: dir.listFiles()){
