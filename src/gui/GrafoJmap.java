@@ -72,8 +72,8 @@ public class GrafoJmap {
       }
     }
 
-    public static float distFrom(Coordinate cor1, Coordinate cor2) {
-        double earthRadius = 6371000; //meters
+    public static double distFrom(Coordinate cor1, Coordinate cor2) {
+    /*   double earthRadius = 6371000; //meters
         double dLat = Math.toRadians(cor2.getLat() - cor1.getLat());
         double dLng = Math.toRadians(cor2.getLat() - cor1.getLat());
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -82,8 +82,21 @@ public class GrafoJmap {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         float dist = (float) (earthRadius * c);
 
-        return dist;
+       return dist;
+*/
+
+        double ret =0.0;
+        double lat1 = cor1.getLat();
+        double lat2 = cor2.getLat();
+        double lon1 = cor1.getLon();
+        double lon2 = cor2.getLon();
+        ret = Math.sqrt( ((lat2-lat1)*(lat2-lat1)) + ((lon2-lon1)*(lon2-lon1)) ) ;
+        return ret;
     }
+
+
+
+
 
     public void render(JMapViewer miMapa) {
         Color color = Color.RED;
