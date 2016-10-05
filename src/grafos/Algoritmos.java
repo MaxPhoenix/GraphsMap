@@ -24,9 +24,7 @@ public class Algoritmos
 
 	public static GrafoPesado Clusters(GrafoPesado gp) {
 
-
 		Arista ar = promedio(gp);
-
 		gp.quitarArista(ar.origen, ar.destino);
 		return gp;
 	}

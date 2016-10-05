@@ -59,7 +59,7 @@ public class Grafo
 			throw new IllegalArgumentException("Vertices fuera de rango: " + i + ", " + j + " (vertices = " + vertices() + ")");
 
 		if (i == j)
-			throw new IllegalArgumentException("No se pueden agregar loops: " + i);
+			throw new IllegalArgumentException("No se pueden agregar loops: " + i +" "+j);
 	}
 
 	public int gradoDelVertice(int v){

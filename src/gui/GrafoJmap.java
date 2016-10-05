@@ -17,40 +17,61 @@ import java.util.Set;
  * Created by Agus on 28/9/2016.
  */
 public class GrafoJmap {
-    public ArrayList<Coordinate> coordenadas = new ArrayList<>();
-    FileManager f;
-    private ArrayList<Arista> aristasOriginal = new ArrayList<>();
+     FileManager f;
 
-    public ArrayList<Coordinate> getCoordenadas() {
+    public ArrayList<Coordinate> coordenadas = new ArrayList<>();
+
+    private ArrayList<Arista> aristasAGM = new ArrayList<>();
+    private ArrayList<Arista> aristasCompleto = new ArrayList<>();
+    private ArrayList<Arista> aristasClusters = new ArrayList<>();
+    private ArrayList<Arista> drawableAristas = new ArrayList<Arista>();  //este swapea entre las distinas opciones de grafo
+
+    private GrafoPesado grafoCompleto;
+    private GrafoPesado AGM;
+    private GrafoPesado clusters;
+    private GrafoPesado drawableGraph ;
+
+    public enum GraphType{AGM,COMPLETO,CLUSTERS}
+
+    private String graphMode = "Completo";
+
+    private ArrayList<Coordinate> getCoordenadas() {
         return coordenadas;
     }
-
-    public ArrayList<Arista> getAristas() {
-        return aristas;
+    public ArrayList<Arista> getDrawableAristas() {
+        return drawableAristas;
     }
-
-    public GrafoPesado getGp() {
-        return gp;
+    public GrafoPesado getGrafoCompleto() {
+        return grafoCompleto;
     }
+    public GrafoPesado getAGM() {
+        return AGM;
+    }
+    public GrafoPesado getClusters() {
+        return clusters;
+    }
+    public String getMode(){return this.graphMode;}
 
-    private ArrayList<Arista> aristas;
-    private GrafoPesado gp;
-    
+//Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
     public GrafoJmap(FileManager f) {
         this.f = f;
         this.coordenadas = f.getCordinates();
-     //----------------------------------------------------------------------------------------
-        //ESTO CRASHEA SI EL ARCHIVO ESTA VACIO, NO ES ESA LA IDEA, ES LA FUNCION CLUSTERS EL TEMA CUANDO RECIBE UN ARCHIVO VACIO.
-        // LA IDEA ORIGINAL DEL TP ES QUE NO SE HAGAN CLUSTERS NI BIEN SE ABRE EL PROGRAMA, SINO DESPUES
-        //LO QUE PUSIMOS ACA ES DE PRUEBA NOMAS 
-        gp = toGrafo(coordenadas);
-        gp = Algoritmos.AGM(gp);
-       // gp = Algoritmos.Clusters(gp);
-        toArista(gp);
-        aristasOriginal = aristas;
-       //----------------------------------------------------------------------------------
+
+        grafoCompleto = toGrafo(coordenadas);
+        AGM = Algoritmos.AGM(grafoCompleto);
+        GrafoPesado agmAux = Algoritmos.AGM(grafoCompleto); //este es para que agm no se modifique al hacer clusters y se dibuje completo
+        clusters = Algoritmos.Clusters(agmAux);
+
+        aristasCompleto = toArista(grafoCompleto);
+        aristasAGM = toArista(AGM);
+        aristasClusters = toArista(clusters);
+
+        this.drawableGraph = AGM;
+        this.drawableAristas = toArista(drawableGraph);
+
     }
 
+    //TODO este lo usaste para algun test tuyo agus, fijate si lo dejas o no
     public GrafoJmap(FileManager f,boolean test) {
         this.f = f;
         this.coordenadas = f.getCordinates();
@@ -60,32 +81,25 @@ public class GrafoJmap {
         // LA IDEA ORIGINAL DEL TP ES QUE NO SE HAGAN CLUSTERS NI BIEN SE ABRE EL PROGRAMA, SINO DESPUES
         //LO QUE PUSIMOS ACA ES DE PRUEBA NOMAS
 
-        gp = toGrafo(coordenadas);
+        grafoCompleto = toGrafo(coordenadas);
+
       if(!test) {
 
 
-          gp = Algoritmos.AGM(gp);
-          // gp = Algoritmos.Clusters(gp);
-          toArista(gp);
-          aristasOriginal = aristas;
+          grafoCompleto = Algoritmos.AGM(grafoCompleto);
+          // grafoCompleto = Algoritmos.Clusters(grafoCompleto);
+          this.drawableAristas = toArista(grafoCompleto);
+
           //----------------------------------------------------------------------------------
       }
     }
 
     public static double distFrom(Coordinate cor1, Coordinate cor2) {
-    /*   double earthRadius = 6371000; //meters
-        double dLat = Math.toRadians(cor2.getLat() - cor1.getLat());
-        double dLng = Math.toRadians(cor2.getLat() - cor1.getLat());
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(cor1.getLat())) * Math.cos(Math.toRadians(cor2.getLat())) *
-                        Math.sin(dLng / 2) * Math.sin(dLng / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        float dist = (float) (earthRadius * c);
-
-       return dist;
-*/
-
-        double ret =0.0;
+        double ret = 0.0;
+        if(cor1.equals(cor2))
+            return ret;
+        else if (cor1 == null || cor2 == null)
+            return ret;
         double lat1 = cor1.getLat();
         double lat2 = cor2.getLat();
         double lon1 = cor1.getLon();
@@ -94,11 +108,10 @@ public class GrafoJmap {
         return ret;
     }
 
+//ahora render dibuja las aristas en base al modo ya cambiado anteriormente
+    public void render(JMapViewer miMapa ) {
+        this.drawableAristas = toArista(this.drawableGraph);
 
-
-
-
-    public void render(JMapViewer miMapa) {
         Color color = Color.RED;
 
         for (Coordinate c : coordenadas) {
@@ -106,12 +119,12 @@ public class GrafoJmap {
             nuevoMarker.getStyle().setBackColor(color);
             miMapa.addMapMarker(nuevoMarker);
         }
-        for (Arista v : aristas)
+        for (Arista v : drawableAristas)
             v.render(miMapa);
 }
 
-    public void toArista(GrafoPesado gp) {
-        ArrayList<Arista> ret = new ArrayList<>(gp.vertices());
+    public ArrayList<Arista> toArista(GrafoPesado gp) {
+        ArrayList<Arista> ret = new ArrayList<Arista>(gp.vertices());
 
         for (int i = 0; i < gp.vertices(); i++) {
             Set<Integer> vecinos = gp.vecinos(i);
@@ -125,7 +138,7 @@ public class GrafoJmap {
             }
         }
 
-        this.aristas=ret;
+        return ret;
     }
 
     public GrafoPesado toGrafo(ArrayList<Coordinate> list) {
@@ -140,6 +153,22 @@ public class GrafoJmap {
 
     }
 
-
+//este metodo cambia el modo de grafo entre completo, agm y clusters
+    public void changeMode(GraphType modo){
+        if(modo == GraphType.AGM) {
+            this.drawableGraph = AGM;
+            this.graphMode = "AGM";
+        }
+        else if (modo == GraphType.CLUSTERS) {
+            this.drawableGraph = clusters;
+            this.graphMode = "Clusters";
+        }
+        else if(modo == GraphType.COMPLETO) {
+            this.drawableGraph = grafoCompleto;
+            this.graphMode = "Completo";
+        }
+        else
+            return;
+    }
 
 }
