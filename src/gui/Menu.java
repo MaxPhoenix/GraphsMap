@@ -148,24 +148,32 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if(agmCheck.isSelected() == true){
+    	JGrafo.changeMode(GrafoJmap.GraphType.NINGUNA);
+    	if(agmCheck.isSelected() == true){
             miMapa.removeAllMapMarkers();
             miMapa.removeAllMapPolygons();
             JGrafo.changeMode(GrafoJmap.GraphType.AGM);
-            JGrafo.render(miMapa);
+      
         }
         else if(completeCheck.isSelected() == true){
             miMapa.removeAllMapMarkers();
             miMapa.removeAllMapPolygons();
             JGrafo.changeMode(GrafoJmap.GraphType.COMPLETO);
-            JGrafo.render(miMapa);
+          
         }
         else if(clusterCheck.isSelected() == true){
             miMapa.removeAllMapMarkers();
             miMapa.removeAllMapPolygons();
             JGrafo.changeMode(GrafoJmap.GraphType.CLUSTERS);
-            JGrafo.render(miMapa);
+       
         }
+        
+        
+        
+      
+        
+        	JGrafo.render(miMapa);
+       
     }
 
     @Override
@@ -247,8 +255,9 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
 
                 m.setCordinates(m.retrieveCoordinates());
                 JGrafo = new GrafoJmap(m);
+                JGrafo.render(miMapa);
                 miMapa.setDisplayPositionByLatLon(m.getCordinates().get(0).getLat(),m.getCordinates().get(0).getLon(), 11);
-                agmCheck.setSelected(true);
+                //agmCheck.setSelected(true);
 
             }
         }
@@ -289,8 +298,9 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         m = new FileManager(opcion);
         m.setCordinates(m.retrieveCoordinates());
         JGrafo = new GrafoJmap(m);
+        JGrafo.render(miMapa);
         miMapa.setDisplayPositionByLatLon(m.getCordinates().get(0).getLat(),m.getCordinates().get(0).getLon(), 11);
-        agmCheck.setSelected(true);
+        //agmCheck.setSelected(true);
 
         return true;
     }

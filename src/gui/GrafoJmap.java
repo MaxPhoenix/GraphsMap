@@ -24,14 +24,28 @@ public class GrafoJmap {
     private ArrayList<Arista> aristasAGM = new ArrayList<>();
     private ArrayList<Arista> aristasCompleto = new ArrayList<>();
     private ArrayList<Arista> aristasClusters = new ArrayList<>();
-    private ArrayList<Arista> drawableAristas = new ArrayList<Arista>();  //este swapea entre las distinas opciones de grafo
+    private ArrayList<Arista> aristasActuales = new ArrayList<Arista>();  //este swapea entre las distinas opciones de grafo
 
     private GrafoPesado grafoCompleto;
     private GrafoPesado AGM;
-    private GrafoPesado clusters;
-    private GrafoPesado drawableGraph ;
+    private int cantClusters=3;
 
-    public enum GraphType{AGM,COMPLETO,CLUSTERS}
+    public enum GraphType{AGM,COMPLETO,CLUSTERS,NINGUNA;
+    @Override	
+    public String toString(){
+    	switch(this){
+    	case AGM:return "AGM";
+    	case COMPLETO: return "Completo";
+    	case CLUSTERS: return "Clusters";
+    	case NINGUNA: return "Ninguna";
+    	default: return "Desconocido";
+    	}
+    }
+    	
+    
+    }
+    
+    
 
     private String graphMode = "Completo";
 
@@ -39,7 +53,7 @@ public class GrafoJmap {
         return coordenadas;
     }
     public ArrayList<Arista> getDrawableAristas() {
-        return drawableAristas;
+        return aristasActuales;
     }
     public GrafoPesado getGrafoCompleto() {
         return grafoCompleto;
@@ -47,28 +61,22 @@ public class GrafoJmap {
     public GrafoPesado getAGM() {
         return AGM;
     }
-    public GrafoPesado getClusters() {
-        return clusters;
-    }
+   
     public String getMode(){return this.graphMode;}
 
 //Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
     public GrafoJmap(FileManager f) {
         this.f = f;
         this.coordenadas = f.getCordinates();
-
         grafoCompleto = toGrafo(coordenadas);
+        aristasCompleto=toArista(grafoCompleto);
         AGM = Algoritmos.AGM(grafoCompleto);
-        GrafoPesado agmAux = Algoritmos.AGM(grafoCompleto); //este es para que agm no se modifique al hacer clusters y se dibuje completo
-        clusters = Algoritmos.Clusters(agmAux);
-
-        aristasCompleto = toArista(grafoCompleto);
         aristasAGM = toArista(AGM);
-        aristasClusters = toArista(clusters);
-
-        this.drawableGraph = AGM;
-        this.drawableAristas = toArista(drawableGraph);
-
+        aristasClusters = borrarAristaMax(toArista(AGM),cantClusters) ;
+        
+       
+		
+      
     }
 
     //TODO este lo usaste para algun test tuyo agus, fijate si lo dejas o no
@@ -88,12 +96,24 @@ public class GrafoJmap {
 
           grafoCompleto = Algoritmos.AGM(grafoCompleto);
           // grafoCompleto = Algoritmos.Clusters(grafoCompleto);
-          this.drawableAristas = toArista(grafoCompleto);
+          this.aristasActuales = toArista(grafoCompleto);
 
           //----------------------------------------------------------------------------------
       }
     }
 
+
+    public ArrayList<Arista> borrarAristaMax(ArrayList<Arista> arr, int n){
+    	
+    	for( int i=0 ; i<=n; i++){
+    		System.out.println(arr.remove((Arista)Arista.getMax(arr)));
+    		System.out.println(arr.size());
+    	}
+    	
+    	return arr;
+    }
+    
+    
     public static double distFrom(Coordinate cor1, Coordinate cor2) {
         double ret = 0.0;
         if(cor1.equals(cor2))
@@ -110,7 +130,7 @@ public class GrafoJmap {
 
 //ahora render dibuja las aristas en base al modo ya cambiado anteriormente
     public void render(JMapViewer miMapa ) {
-        this.drawableAristas = toArista(this.drawableGraph);
+       
 
         Color color = Color.RED;
 
@@ -119,7 +139,7 @@ public class GrafoJmap {
             nuevoMarker.getStyle().setBackColor(color);
             miMapa.addMapMarker(nuevoMarker);
         }
-        for (Arista v : drawableAristas)
+        for (Arista v : this.aristasActuales)
             v.render(miMapa);
 }
 
@@ -156,19 +176,20 @@ public class GrafoJmap {
 //este metodo cambia el modo de grafo entre completo, agm y clusters
     public void changeMode(GraphType modo){
         if(modo == GraphType.AGM) {
-            this.drawableGraph = AGM;
-            this.graphMode = "AGM";
+            this.aristasActuales= aristasAGM;
+           
         }
         else if (modo == GraphType.CLUSTERS) {
-            this.drawableGraph = clusters;
-            this.graphMode = "Clusters";
+        	 this.aristasActuales= aristasClusters;
         }
         else if(modo == GraphType.COMPLETO) {
-            this.drawableGraph = grafoCompleto;
-            this.graphMode = "Completo";
+        	 this.aristasActuales= aristasCompleto;
+
         }
         else
-            return;
+        	this.aristasActuales=new ArrayList<>();
+        	
+           ;
     }
 
 }

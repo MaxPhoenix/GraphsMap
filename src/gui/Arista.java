@@ -12,7 +12,7 @@ public class Arista {
 
 
     public Arista(Coordinate a, Coordinate b) {
-        if (a == null || b == null || a.equals(b))
+        if (a == null || b == null )
             throw new RuntimeException("Null cordinate");
 
         this.a = a;
@@ -20,6 +20,33 @@ public class Arista {
 
     }
 
+    public static Arista getMax(ArrayList <Arista> list){
+    	
+    	Coordinate cor=new Coordinate(1,1);
+    	Arista max=new Arista(cor,cor);
+    
+    	Arista aux=null;
+    	for (Arista arista: list){
+    		if(arista.getPeso ()>max.getPeso()){
+    			aux=arista;
+    			max=arista;
+    			
+    			
+    		}
+    	
+    	}
+    	return aux;
+    	
+    	
+    }
+    
+    
+    
+    public double getPeso (){
+    	return GrafoJmap.distFrom(this.a,this.b);
+    	
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
