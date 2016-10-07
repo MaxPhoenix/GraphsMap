@@ -25,8 +25,8 @@ public class GrafoJmap {
     private ArrayList<Arista> aristasCompleto = new ArrayList<>();
     private ArrayList<Arista> aristasClusters = new ArrayList<>();
     private ArrayList<Arista> aristasActuales = new ArrayList<Arista>();  //este swapea entre las distinas opciones de grafo
-
     private GrafoPesado grafoCompleto;
+    private Cluster modoCluster=Cluster.MAXIMO;
     private GrafoPesado AGM;
     private int cantClusters=3;
 
@@ -41,11 +41,9 @@ public class GrafoJmap {
     	default: return "Desconocido";
     	}
     }
-    	
-    
     }
-    
-    
+    public enum Cluster{MAXIMO,PROMEDIO,INTELIGENTE;
+    }
 
     private String graphMode = "Completo";
 
@@ -72,7 +70,7 @@ public class GrafoJmap {
         aristasCompleto=toArista(grafoCompleto);
         AGM = Algoritmos.AGM(grafoCompleto);
         aristasAGM = toArista(AGM);
-        aristasClusters = borrarAristaMax(toArista(AGM),cantClusters) ;
+        aristasClusters = toArista(AGM);
         
        
 		
@@ -83,12 +81,6 @@ public class GrafoJmap {
     public GrafoJmap(FileManager f,boolean test) {
         this.f = f;
         this.coordenadas = f.getCordinates();
-
-        //----------------------------------------------------------------------------------------
-        //ESTO CRASHEA SI EL ARCHIVO ESTA VACIO, NO ES ESA LA IDEA, ES LA FUNCION CLUSTERS EL TEMA CUANDO RECIBE UN ARCHIVO VACIO.
-        // LA IDEA ORIGINAL DEL TP ES QUE NO SE HAGAN CLUSTERS NI BIEN SE ABRE EL PROGRAMA, SINO DESPUES
-        //LO QUE PUSIMOS ACA ES DE PRUEBA NOMAS
-
         grafoCompleto = toGrafo(coordenadas);
 
       if(!test) {
@@ -98,20 +90,11 @@ public class GrafoJmap {
           // grafoCompleto = Algoritmos.Clusters(grafoCompleto);
           this.aristasActuales = toArista(grafoCompleto);
 
-          //----------------------------------------------------------------------------------
+
       }
     }
 
 
-    public ArrayList<Arista> borrarAristaMax(ArrayList<Arista> arr, int n){
-    	
-    	for( int i=0 ; i<=n; i++){
-    		System.out.println(arr.remove((Arista)Arista.getMax(arr)));
-    		System.out.println(arr.size());
-    	}
-    	
-    	return arr;
-    }
     
     
     public static double distFrom(Coordinate cor1, Coordinate cor2) {
@@ -141,6 +124,7 @@ public class GrafoJmap {
         }
         for (Arista v : this.aristasActuales)
             v.render(miMapa);
+
 }
 
     public ArrayList<Arista> toArista(GrafoPesado gp) {
@@ -173,10 +157,38 @@ public class GrafoJmap {
 
     }
 
-//este metodo cambia el modo de grafo entre completo, agm y clusters
+    public ArrayList<Arista> getAristasActuales() {
+        return aristasActuales;
+    }
+
+    public void changeClusterMode(Cluster cluster , int cantClusters) {
+        aristasClusters=toArista(AGM);
+        if(cluster==Cluster.MAXIMO){
+            for( int i=0 ; i<=cantClusters; i++){
+
+              aristasClusters.remove((Arista.getMax(aristasClusters)));
+
+
+            }
+
+            System.out.println("Cluster "+cluster);
+        }
+        if(cluster==Cluster.PROMEDIO){
+      // TODO     borrarAristaProm(this.aristasClusters,cantClusters);
+        }
+        if(cluster==Cluster.INTELIGENTE){
+         //TODO   borrarAristaIntel(this.aristasClusters,cantClusters);
+        }
+
+        aristasActuales=aristasClusters;
+
+    }
+
+    //este metodo cambia el modo de grafo entre completo, agm y clusters
     public void changeMode(GraphType modo){
+
         if(modo == GraphType.AGM) {
-            this.aristasActuales= aristasAGM;
+           this.aristasActuales= aristasAGM;
            
         }
         else if (modo == GraphType.CLUSTERS) {
@@ -188,8 +200,10 @@ public class GrafoJmap {
         }
         else
         	this.aristasActuales=new ArrayList<>();
-        	
-           ;
+
+
+        System.out.println("Cambio de modo a " + modo );
+
     }
 
 }

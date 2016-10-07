@@ -25,9 +25,9 @@ public class GrafoJmapTest {
 
         test.toArista(bkp.getGrafoCompleto());
 
-        System.out.println("Aristas= "+test.getDrawableAristas().size()+" | "+bkp.getGrafoCompleto().aristas());
+        System.out.println("Aristas= "+test.getAristasActuales().size()+" | "+bkp.getGrafoCompleto().aristas());
         if( test.f.nombre.equals("Archivos/instanciaTest.json"))
-            assertEquals(3, test.getDrawableAristas().size());
+            assertEquals(3, test.getAristasActuales().size());
 
 
     }
