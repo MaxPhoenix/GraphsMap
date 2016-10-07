@@ -21,13 +21,12 @@ public class GrafoJmapTest {
     @Test
     public void toAristaTest() {
         GrafoJmap test=instancia(true);
-        GrafoJmap bkp=instancia(false);
 
-        test.toArista(bkp.getGrafoCompleto());
 
-        System.out.println("Aristas= "+test.getAristasActuales().size()+" | "+bkp.getGrafoCompleto().aristas());
+        //test.toArista(bkp.getGrafoCompleto());
+
         if( test.f.nombre.equals("Archivos/instanciaTest.json"))
-            assertEquals(3, test.getAristasActuales().size());
+            assertEquals(3, test.getAristasAGM().size());
 
 
     }
@@ -59,7 +58,7 @@ public class GrafoJmapTest {
     public GrafoJmap instancia(boolean incializada){
         FileManager f=new FileManager("Archivos/instanciaTest.json");
         f.retrieveCoordinates();
-        GrafoJmap gp=new GrafoJmap(f,incializada);
+        GrafoJmap gp=new GrafoJmap(f);
         return gp;
     }
 

@@ -21,6 +21,10 @@ public class GrafoJmap {
 
     public ArrayList<Coordinate> coordenadas = new ArrayList<>();
 
+    public ArrayList<Arista> getAristasAGM() {
+        return aristasAGM;
+    }
+
     private ArrayList<Arista> aristasAGM = new ArrayList<>();
     private ArrayList<Arista> aristasCompleto = new ArrayList<>();
     private ArrayList<Arista> aristasClusters = new ArrayList<>();
