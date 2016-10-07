@@ -135,6 +135,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         frame.add( promedioRadio);
         promedioRadio.setVisible(false);
         promedioRadio.setOpaque(false);
+        promedioRadio.setEnabled(false);
 
 
         intelliRadio =new JRadioButton("Inteligente");
@@ -144,6 +145,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         frame.add(intelliRadio);
         intelliRadio.setVisible(false);
         intelliRadio.setOpaque(false);
+        intelliRadio.setEnabled(false);
 
 
 
@@ -285,7 +287,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
          }
 
            if(e.getSource()==aplicarButton) {
-              // Modo=GraphType.CLUSTERS;
+
                 String n=JOptionPane.showInputDialog(this,"Ingrese la cantidad de clusters");
 
                if(isInteger(n)){
@@ -298,11 +300,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
 
 
            }
-
-
-
-
-
 
            JGrafo.render(miMapa);
 

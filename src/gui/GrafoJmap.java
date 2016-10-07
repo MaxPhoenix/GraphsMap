@@ -168,7 +168,7 @@ public class GrafoJmap {
     public void changeClusterMode(Cluster cluster , int cantClusters) {
         aristasClusters=toArista(AGM);
         if(cluster==Cluster.MAXIMO){
-            for( int i=0 ; i<=cantClusters; i++){
+            for( int i=0 ; i<cantClusters-1; i++){
 
               aristasClusters.remove((Arista.getMax(aristasClusters)));
 
