@@ -29,7 +29,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
     private JButton start, exit, createInstance, aplicarButton;
     private JMapViewer miMapa;
     private GraphType Modo = GrafoJmap.GraphType.AGM;
-    private Cluster modoCluster = GrafoJmap.Cluster.PROMEDIO;
+    private Cluster modoCluster ;
     private File userFolder, projectDirectory;
     private FileManager fileManager;
     private int width = 1280, height = width / 12 * 9;
@@ -313,6 +313,13 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
                 else {
                     miMapa.removeAllMapMarkers();
                     miMapa.removeAllMapPolygons();
+                    if(maximoRadio.isSelected())
+                         modoCluster= Cluster.MAXIMO;
+                    else if(promedioRadio.isSelected())
+                        modoCluster = Cluster.PROMEDIO;
+                    else{
+                        //TODO modocluster = Cluster.INTELIGENTE;
+                    }
                     JGrafo.changeClusterMode(modoCluster, input);
                     JGrafo.changeMode(GraphType.CLUSTERS);
                 }

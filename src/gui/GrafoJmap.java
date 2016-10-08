@@ -165,19 +165,24 @@ public class GrafoJmap {
 
     public void changeClusterMode(Cluster cluster , int cantClusters) {
         aristasClusters=toArista(AGM);
+
         if(cluster==Cluster.MAXIMO){
             for( int i=0 ; i<cantClusters-1; i++){
               aristasClusters.remove((Arista.getMax(aristasClusters)));
             }
             System.out.println("Cluster "+cluster);
         }
-        if(cluster==Cluster.PROMEDIO){
-            ArrayList<Double> distances = Arista.distances(aristasClusters); //ya ordenada
-            Double promedio = Arista.promedio(distances);
-            Double mediumDistance = Arista.mediumDistance(distances,promedio);
-            aristasClusters.remove(Arista.mediumArista(aristasClusters,mediumDistance));
-            System.out.println("Cluster "+cluster);
+        if(cluster==Cluster.PROMEDIO) {
+            for (int i = 0; i < cantClusters - 1; i++) {
+                ArrayList<Double> distances = Arista.distances(aristasClusters); //ya ordenada
+                Double promedio = Arista.promedio(distances);
+                Double mediumDistance = Arista.mediumDistance(distances, promedio);
+                aristasClusters.remove(Arista.mediumArista(aristasClusters, mediumDistance));
+
+            }
+            System.out.println("Cluster " + cluster);
         }
+
 
         if(cluster==Cluster.INTELIGENTE){
          //TODO   borrarAristaIntel(this.aristasClusters,cantClusters);
