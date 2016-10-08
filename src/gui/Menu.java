@@ -8,6 +8,7 @@ import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -30,7 +31,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
     private GraphType Modo= GrafoJmap.GraphType.AGM;
     private Cluster modoCluster=GrafoJmap.Cluster.MAXIMO;
     private File userFolder, projectDirectory;
-    private FileManager m;
+    private FileManager fileManager;
     private int width = 1280, height = width / 12 * 9;
     private boolean menu = true; //para que no sea expandible la ventana
     private GrafoJmap JGrafo;
@@ -66,6 +67,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         frame=new JFrame("TPJmapViewer");
         frame.setLocationRelativeTo(null);
         frame.setBounds(100, 100, width,height);
+        System.out.println(frame.getBounds());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
         frame.setResizable(false);
@@ -78,22 +80,22 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
 
 
         start = new JButton("Start");
-        start.setBounds(width-200,height-200,150,50);
+        start.setBounds((int)(width/1.2),(int)(height/1.2),150,50);
         start.addActionListener(this);
         frame.add(start);
 
         exit= new JButton("Exit");
-        exit.setBounds(width-200,height-100,150,50);
+        exit.setBounds((int)(width/1.2),(int)(height/1.1),150,50);
         exit.addActionListener(this);
         frame.add(exit);
 
         createInstance = new JButton("Crear nueva instancia");
-        createInstance.setBounds(width /4,height/3,400,50);
+        createInstance.setBounds(width /3,height/3,400,50);
         createInstance.addActionListener(this);
         frame. add(createInstance);
 
         fileCombo = new JComboBox();
-        fileCombo.setBounds(width /4,height/2,400,50);
+        fileCombo.setBounds(width /3,height/2,400,50);
         fileCombo.addActionListener(this);
         addFilestoComboBox();
         frame.add(fileCombo);
@@ -111,6 +113,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         modeCombo.setVisible(false);
         modeCombo.setSelectedItem("Modo: Ninguna");
 
+
         int offset=width/45;
         clusterCheck=new JCheckBox("Cluster");
         clusterCheck.setBounds(width/6,0,90,30);
@@ -120,6 +123,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         clusterCheck.setVisible(false);
         clusterCheck.setOpaque(false);
 
+
         maximoRadio=new JRadioButton("Maximo");
         maximoRadio.setFont(maximoRadio.getFont().deriveFont(1,15F));
         maximoRadio.setBounds((int)(width/4.38)+offset,0,95,30);
@@ -127,6 +131,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         frame.add( maximoRadio);
         maximoRadio.setVisible(false);
         maximoRadio.setOpaque(false);
+
 
         promedioRadio=new JRadioButton("Promedio");
         promedioRadio.setFont(promedioRadio.getFont().deriveFont(1,15F));
@@ -148,14 +153,11 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         intelliRadio.setEnabled(false);
 
 
-
         aplicarButton = new JButton("Aplicar");
         aplicarButton.setBounds((int)(width/2.1)+offset,0,85,30);
         aplicarButton.addActionListener(this);
         frame.add(aplicarButton);
         aplicarButton.setVisible(false);
-
-
 
 
         frame.setVisible(true);
@@ -207,13 +209,8 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
                for (JRadioButton j : link)
                    j.setSelected(false);
 
-
            }
-
-
-
         }
-
 
     }
     @Override
@@ -228,25 +225,37 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
                     turnInvisible(new Object[]{start, createInstance, fileCombo});
                     turnVisible(new Object[]{modeCombo});
                 }
+
             }
-            if (e.getSource() == createInstance) {
-                if (createMap()) {
+            else if (e.getSource() == createInstance) {
+                if (createMap() ==true) {
                     menu = false;
                     frame.setResizable(true);
                     turnInvisible(new Object[]{start, createInstance, fileCombo});
                     turnVisible(new Object[]{modeCombo});
+
                 }
+
             }
 
-            if (e.getSource() == exit) {
+            else if (e.getSource() == exit) {
                 System.exit(0);
 
             }
-        } else {
+        }
+        else {
 
             selecciondeModo(e);
             if (e.getSource() == exit) {
                 menu = true;
+                Rectangle frameBounds=(frame.getBounds());
+                width = frameBounds.width;
+                height = frameBounds.height;
+                frame.setResizable(false);
+                start.setBounds((int)(width/1.2),(int)(height/1.2),150,50);
+                exit.setBounds((int)(width/1.2),(int)(height/1.1),150,50);
+                createInstance.setBounds(width /3,height/3,400,50);
+                fileCombo.setBounds(width /3,height/2,400,50);
                 miMapa.removeAllMapMarkers();
                 miMapa.removeAllMapPolygons();
                 turnVisible(new Object[]{start, createInstance, fileCombo});
@@ -258,8 +267,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
 
        private void selecciondeModo(ActionEvent e){
 
-        clusterCheck.setVisible(true);
-
          if(e.getSource()==modeCombo) {
 
              if((modeCombo.getSelectedItem().toString().contains("AGM"))&&!clusterCheck.isSelected()){
@@ -267,7 +274,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
                  miMapa.removeAllMapPolygons();
                  clusterCheck.setVisible(true);
                  JGrafo.changeMode(GraphType.AGM);
-
 
         }
              else if(modeCombo.getSelectedItem().toString().contains("Completo")){
@@ -288,7 +294,8 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
 
            if(e.getSource()==aplicarButton) {
 
-                String n=JOptionPane.showInputDialog(this,"Ingrese la cantidad de clusters");
+
+               String n=JOptionPane.showInputDialog(this,"Ingrese la cantidad de clusters");
 
                if(isInteger(n)){
                  Integer input=Integer.parseInt(n);
@@ -297,10 +304,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
                    JGrafo.changeClusterMode(modoCluster,input);
                    JGrafo.changeMode(GraphType.CLUSTERS);
                }
-
-
            }
-
            JGrafo.render(miMapa);
 
 
@@ -316,10 +320,10 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         Integer cantCoordenadas = 0;
         String nombre = showInputDialog(this,"nombre del archivo? se guardara en "+ userFolder.getAbsolutePath())+".json";
 
-        if(nombre.equals("null.json")  || nombre.equals(".json")){
+        if(nombre.equals("null.json")  || nombre.equals(".json") || isInvalidName(nombre)){
             JOptionPane.showMessageDialog(this, "Ingrese un nombre valido de archivo", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
-            }
+        }
             else {
                 String cant = (showInputDialog(this, "cuantas ingresas?"));
 
@@ -357,17 +361,17 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
                     fileCoordinates.add(new Coordinate(cor.getLat(), cor.getLon()));
 
                 //crea un filemanager que guarda como coordinates el arreglo de coordenada creado arriba
-                m = new FileManager(userFolder.getAbsolutePath() + "\\" + nombre);
+                fileManager = new FileManager(userFolder.getAbsolutePath() + "\\" + nombre);
                 System.out.println(userFolder.getAbsolutePath() + "\\" + nombre);
-                m.setCordinates(fileCoordinates);
+                fileManager.setCordinates(fileCoordinates);
                 //cambie la funcion store coordinates para que guarde un directorio
-                m.storeCoordinates();
+                fileManager.storeCoordinates();
 
-                m.setCordinates(m.retrieveCoordinates());
-                JGrafo = new GrafoJmap(m);
+                fileManager.setCordinates(fileManager.retrieveCoordinates());
+                JGrafo = new GrafoJmap(fileManager);
                 JGrafo.render(miMapa);
-                miMapa.setDisplayPositionByLatLon(m.getCordinates().get(0).getLat(),m.getCordinates().get(0).getLon(), 11);
-                //agmCheck.setSelected(true);
+                miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
+
 
             }
         }
@@ -404,12 +408,12 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
                 opcion = fileDir;
             }
         }
-        m = new FileManager(opcion);
-        m.setCordinates(m.retrieveCoordinates());
-        JGrafo = new GrafoJmap(m);
+        fileManager = new FileManager(opcion);
+        fileManager.setCordinates(fileManager.retrieveCoordinates());
+        JGrafo = new GrafoJmap(fileManager);
         JGrafo.render(miMapa);
-        miMapa.setDisplayPositionByLatLon(m.getCordinates().get(0).getLat(),m.getCordinates().get(0).getLon(), 11);
-        //agmCheck.setSelected(true);
+        miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
+
 
         return true;
     }
@@ -458,15 +462,22 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
         else if(option == JOptionPane.CANCEL_OPTION){
             return new Coordenada();
         }
+        else if(option == JOptionPane.CLOSED_OPTION)
+            return new Coordenada();
 
         return null;
     }
 
     private boolean isInteger(String s){
         String integer = "-+0123456789";
+        String nonCharacters = ".,_/(&%$#!|°=\\)¨´^{}";
         for(int i = 0 ; i < s.length(); i++){
+            if(i != 0 ) {
+                if (s.charAt(i) == '+' || s.charAt(i) == '-')
+                    return false;
+            }
             char c = s.charAt(i);
-            if(integer.indexOf(c) == -1)
+            if(integer.indexOf(c) == -1 || nonCharacters.indexOf(c) != -1)
                 return false;
         }
         return true;
@@ -474,13 +485,28 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener{
 
     private static boolean onlyNumbers(String s){
         String numbers = "-+.0123456789";
+        String nonCharacters = ".,_/(&%$#!|°*=\\)¨´^{}";
         for(int i = 0 ; i < s.length(); i++){
+            if(i != 0 ) {
+                if (s.charAt(i) == '+' || s.charAt(i) == '-')
+                    return false;
+            }
             char c = s.charAt(i);
-            if(numbers.indexOf(c) == -1)
+            if(numbers.indexOf(c) == -1 || nonCharacters.indexOf(c) != -1)
                 return false;
         }
         return true;
     }
 
 
+
+    private boolean isInvalidName(String s){
+        String nonCharacters = "+-.,_/(&%$#!|°*\\=)¨´^{}";
+        for(int i = 0; i < s.length();i++ ){
+            char c =  s.charAt(i);
+            if(nonCharacters.indexOf(c) != -1)
+                return false;
+        }
+        return true;
+    }
 }
