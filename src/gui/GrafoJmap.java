@@ -117,8 +117,6 @@ public class GrafoJmap {
 
 //ahora render dibuja las aristas en base al modo ya cambiado anteriormente
     public void render(JMapViewer miMapa ) {
-       
-
         Color color = Color.RED;
 
         for (Coordinate c : coordenadas) {
@@ -169,17 +167,18 @@ public class GrafoJmap {
         aristasClusters=toArista(AGM);
         if(cluster==Cluster.MAXIMO){
             for( int i=0 ; i<cantClusters-1; i++){
-
               aristasClusters.remove((Arista.getMax(aristasClusters)));
-
-
             }
-
             System.out.println("Cluster "+cluster);
         }
         if(cluster==Cluster.PROMEDIO){
-      // TODO     borrarAristaProm(this.aristasClusters,cantClusters);
+            ArrayList<Double> distances = Arista.distances(aristasClusters); //ya ordenada
+            Double promedio = Arista.promedio(distances);
+            Double mediumDistance = Arista.mediumDistance(distances,promedio);
+            aristasClusters.remove(Arista.mediumArista(aristasClusters,mediumDistance));
+            System.out.println("Cluster "+cluster);
         }
+
         if(cluster==Cluster.INTELIGENTE){
          //TODO   borrarAristaIntel(this.aristasClusters,cantClusters);
         }
@@ -209,5 +208,7 @@ public class GrafoJmap {
         System.out.println("Cambio de modo a " + modo );
 
     }
+
+
 
 }

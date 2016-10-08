@@ -6,6 +6,7 @@ import org.openstreetmap.gui.jmapviewer.MapPolygonImpl;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Arista {
     private Coordinate a, b;
@@ -30,18 +31,66 @@ public class Arista {
     		if(arista.getPeso ()>max.getPeso()){
     			aux=arista;
     			max=arista;
-    			
-    			
     		}
-    	
     	}
     	return aux;
-    	
-    	
     }
-    
-    
-    
+
+    //un arreglo con todas las distancias del grafo
+    public static ArrayList<Double> distances(ArrayList<Arista> list){
+        ArrayList<Double> distances = new ArrayList<Double>(list.size());
+        for(Arista arista: list){
+            distances.add(arista.getPeso());
+        }
+        Collections.sort(distances);
+        return distances;
+    }
+
+    // busca un promedio estimativo entre las distancias
+    public static Double promedio(ArrayList<Double> list){
+        Double promedio =0.0;
+        Double suma = 0.0;
+        double cant = list.size();
+        for(Double d : list){
+            suma += d;
+        }
+        promedio = suma/cant;
+        return promedio;
+    }
+
+    // busca el elemento en el arreglo de distancias mas cercano al promedio (medium)
+    public static Double mediumDistance(ArrayList<Double> doublesList, Double medium, int start, int finish){
+
+       // ejemplo [1,2,3,4,5,6,7,8,9,10] promedio = 5.5;
+
+        if(start  == finish || start>finish) //si se encuentran
+            return doublesList.get(start);
+
+        if (doublesList.get(start) == medium || doublesList.get(finish) == medium) //el promedio esta en la lista
+            return medium;
+
+        if(doublesList.get(start) < medium && doublesList.get(finish) > medium) //si esta entre los valores me acerco al medio
+            return mediumDistance(doublesList,medium,start+1,finish-1);
+
+        if(doublesList.get(start) < medium && !(doublesList.get(finish) > medium)) //si es mayor al de inicio y al del final voy hacia el final
+            return mediumDistance(doublesList,medium,start+1,finish);
+
+        return mediumDistance(doublesList,medium,start+1,finish); //lo contrario a lo anterior
+    }
+
+    // metodo wrapper del anterior
+    public static Double mediumDistance(ArrayList<Double> list, Double promedio){
+        return mediumDistance(list,promedio, 0, list.size()-1);
+    }
+    //una vez obtenido el promedio busca la arista correspondiente a esa distancia
+    public static Arista mediumArista(ArrayList<Arista> list, Double distance){
+        for(Arista arista: list){
+            if(arista.getPeso() == distance)
+                return arista;
+        }
+        return null;
+    }
+
     public double getPeso (){
     	return GrafoJmap.distFrom(this.a,this.b);
     	
