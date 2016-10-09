@@ -67,10 +67,9 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         frame = new JFrame("TPJmapViewer");
         frame.setLocationRelativeTo(null);
         frame.setBounds(100, 100, width, height);
-        System.out.println(frame.getBounds());
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
-        frame.setResizable(false);
 
 
         miMapa = new JMapViewer();
@@ -80,22 +79,22 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
 
 
         start = new JButton("Start");
-        start.setBounds((int) (width / 1.2), (int) (height / 1.2), 150, 50);
+        start.setBounds(205, 0, 100, 30);
         start.addActionListener(this);
         frame.add(start);
 
         exit = new JButton("Exit");
-        exit.setBounds((int) (width / 1.2), (int) (height / 1.1), 150, 50);
+        exit.setBounds(310, 0, 100, 30);
         exit.addActionListener(this);
         frame.add(exit);
 
         createInstance = new JButton("Crear nueva instancia");
-        createInstance.setBounds(width / 3, height / 3, 400, 50);
+        createInstance.setBounds(0, 35, 200, 30);
         createInstance.addActionListener(this);
         frame.add(createInstance);
 
         fileCombo = new JComboBox();
-        fileCombo.setBounds(width / 3, height / 2, 400, 50);
+        fileCombo.setBounds(0, 0, 200, 30);
         fileCombo.addActionListener(this);
         addFilestoComboBox();
         frame.add(fileCombo);
@@ -114,7 +113,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         modeCombo.setSelectedItem("Modo: Ninguna");
 
 
-        int offset = width / 45;
+        int offset = width / 10; //45
         clusterCheck = new JCheckBox("Cluster");
         clusterCheck.setBounds(width / 6, 0, 90, 30);
         clusterCheck.addChangeListener(this);
@@ -140,7 +139,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         frame.add(promedioRadio);
         promedioRadio.setVisible(false);
         promedioRadio.setOpaque(false);
-        //promedioRadio.setEnabled(false);
+
 
 
         intelliRadio = new JRadioButton("Inteligente");
@@ -165,7 +164,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
     }
 
     private void addFilestoComboBox() {
-        fileCombo.addItem("(Seleccione una instancia)");
+        fileCombo.addItem("(Seleccionar");
         for (String f : projectDirectory.list()) {
             fileCombo.addItem(f);
             projectDirectorySize++;
@@ -248,11 +247,11 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
                     Rectangle frameBounds = (frame.getBounds());
                     width = frameBounds.width;
                     height = frameBounds.height;
-                    frame.setResizable(false);
+                   /* frame.setResizable(false);
                     start.setBounds((int) (width / 1.2), (int) (height / 1.2), 150, 50);
                     exit.setBounds((int) (width / 1.2), (int) (height / 1.1), 150, 50);
                     createInstance.setBounds(width / 3, height / 3, 400, 50);
-                    fileCombo.setBounds(width / 3, height / 2, 400, 50);
+                    fileCombo.setBounds(width / 3, height / 2, 400, 50);*/
                     miMapa.removeAllMapMarkers();
                     miMapa.removeAllMapPolygons();
                     turnVisible(new Object[]{start, createInstance, fileCombo});
@@ -290,45 +289,61 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
 
         if (e.getSource() == aplicarButton) {
 
-
+            if(intelliRadio.isSelected()){
+                miMapa.removeAllMapMarkers();
+                miMapa.removeAllMapPolygons();
+                JGrafo.changeClusterMode(modoCluster, 0);
+                JGrafo.changeMode(GraphType.CLUSTERS);
+                JGrafo.render(miMapa);
+                return;
+            }
             String n = JOptionPane.showInputDialog(this, "Ingrese la cantidad de clusters");
+                if(isNumeroValido(n)){
 
-            if(n == null){
-                JOptionPane.showMessageDialog(this, "No ha seleccionado nada", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            else if(!isInteger(n) || n.equals("")){
-                JOptionPane.showMessageDialog(this, "Solo se permiten digitos para la creacion de clusters", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-
-            else if (isInteger(n)) {
-                Integer input = Integer.parseInt(n);
-                if(input <= 1){
-                    JOptionPane.showMessageDialog(this, "Pueden haber como minimo 2 clusters", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                else {
+                    Integer input = Integer.parseInt(n);
                     miMapa.removeAllMapMarkers();
                     miMapa.removeAllMapPolygons();
-                    if(maximoRadio.isSelected())
-                         modoCluster= Cluster.MAXIMO;
-                    else if(promedioRadio.isSelected())
+
+                    if (maximoRadio.isSelected())
+                        modoCluster = Cluster.MAXIMO;
+                    else if (promedioRadio.isSelected())
                         modoCluster = Cluster.PROMEDIO;
-                    else{
+                    else {
                         //TODO modocluster = Cluster.INTELIGENTE;
                     }
                     JGrafo.changeClusterMode(modoCluster, input);
                     JGrafo.changeMode(GraphType.CLUSTERS);
-                }
+
             }
 
 
         }
         JGrafo.render(miMapa);
     }
+
+    private boolean isNumeroValido(String n){
+       boolean ret=true;
+        if(n == null){
+            JOptionPane.showMessageDialog(this, "No ha seleccionado nada", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if(!isInteger(n) || n.equals("")){
+            JOptionPane.showMessageDialog(this, "Solo se permiten digitos para la creacion de clusters", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if (isInteger(n)) {
+            Integer input = Integer.parseInt(n);
+            if(input <= 1){
+                JOptionPane.showMessageDialog(this, "Pueden haber como minimo 2 clusters", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 
     private boolean createMap() {
         //cartel para ingreso de coordenadas
