@@ -35,7 +35,7 @@ public class GrafoJmap extends Thread{
     private int cantClusters=3;
 
     public enum GraphType{AGM,COMPLETO,CLUSTERS,NINGUNA;
-    @Override	
+    @Override
     public String toString(){
     	switch(this){
     	case AGM:return "AGM";
@@ -63,13 +63,14 @@ public class GrafoJmap extends Thread{
     public GrafoPesado getAGM() {
         return AGM;
     }
-   
+
     public String getMode(){return this.graphMode;}
 
 //Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
     public GrafoJmap(FileManager f) {
         this.f = f;
         this.start();
+
     }
 
     public void run(){
@@ -99,8 +100,8 @@ public class GrafoJmap extends Thread{
     }
 
 
-    
-    
+
+
     public static double distFrom(Coordinate cor1, Coordinate cor2) {
         double ret = 0.0;
         if(cor1.equals(cor2))
@@ -198,7 +199,7 @@ public class GrafoJmap extends Thread{
 
         if(modo == GraphType.AGM) {
            this.aristasActuales= aristasAGM;
-           
+
         }
         else if (modo == GraphType.CLUSTERS) {
         	 this.aristasActuales= aristasClusters;
