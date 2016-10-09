@@ -33,6 +33,7 @@ public class GrafoJmap extends Thread{
     private Cluster modoCluster=Cluster.MAXIMO;
     private GrafoPesado AGM;
     private int cantClusters=3;
+    private JMapViewer miMapa;
 
     public enum GraphType{AGM,COMPLETO,CLUSTERS,NINGUNA;
     @Override
@@ -67,14 +68,27 @@ public class GrafoJmap extends Thread{
     public String getMode(){return this.graphMode;}
 
 //Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
+    public GrafoJmap(FileManager f,JMapViewer miMapa) {
+        this.f = f;
+        this.miMapa=miMapa;
+        this.start();
+
+    }
     public GrafoJmap(FileManager f) {
         this.f = f;
+
         this.start();
 
     }
 
     public void run(){
         this.coordenadas = f.getCordinates();
+        this.render(miMapa);
+        try {
+            currentThread().sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         grafoCompleto = toGrafo(coordenadas);
         aristasCompleto=toArista(grafoCompleto);
         AGM = Algoritmos.AGM(grafoCompleto);
@@ -82,22 +96,6 @@ public class GrafoJmap extends Thread{
         aristasClusters = toArista(AGM);
     }
 
-    //TODO este lo usaste para algun test tuyo agus, fijate si lo dejas o no
-    public GrafoJmap(FileManager f,boolean test) {
-        this.f = f;
-        this.coordenadas = f.getCordinates();
-        grafoCompleto = toGrafo(coordenadas);
-
-      if(!test) {
-
-
-          grafoCompleto = Algoritmos.AGM(grafoCompleto);
-          // grafoCompleto = Algoritmos.Clusters(grafoCompleto);
-          this.aristasActuales = toArista(grafoCompleto);
-
-
-      }
-    }
 
 
 

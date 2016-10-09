@@ -397,7 +397,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
                 fileManager.storeCoordinates();
 
                 fileManager.setCordinates(fileManager.retrieveCoordinates());
-                JGrafo = new GrafoJmap(fileManager);
+                JGrafo = new GrafoJmap(fileManager,miMapa);
                 JGrafo.render(miMapa);
                 miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
             }
@@ -437,7 +437,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         }
         fileManager = new FileManager(opcion);
         fileManager.setCordinates(fileManager.retrieveCoordinates());
-        JGrafo = new GrafoJmap(fileManager);
+        JGrafo = new GrafoJmap(fileManager,miMapa);
         JGrafo.render(miMapa);
         miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
 
