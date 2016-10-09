@@ -28,7 +28,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
     private JRadioButton intelliRadio, maximoRadio, promedioRadio;
     private JButton start, exit, createInstance, aplicarButton;
     private JMapViewer miMapa;
-    private GraphType Modo = GrafoJmap.GraphType.AGM;
+    private GraphType Modo =GraphType.AGM ;
     private Cluster modoCluster ;
     private File userFolder, projectDirectory;
     private FileManager fileManager;
@@ -67,7 +67,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         frame = new JFrame("TPJmapViewer");
         frame.setLocationRelativeTo(null);
         frame.setBounds(100, 100, width, height);
-        System.out.println(frame.getBounds());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
         frame.setResizable(false);
@@ -210,7 +209,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
 
             }
         }
-
     }
 
     @Override
@@ -258,7 +256,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
                     turnVisible(new Object[]{start, createInstance, fileCombo});
                     turnInvisible(new Object[]{modeCombo, intelliRadio, maximoRadio, promedioRadio, clusterCheck, aplicarButton});
             }
-
         }
     }
 

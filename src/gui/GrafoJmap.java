@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by Agus on 28/9/2016.
  */
-public class GrafoJmap {
+public class GrafoJmap extends Thread{
      FileManager f;
 
     public ArrayList<Coordinate> coordenadas = new ArrayList<>();
@@ -69,16 +69,16 @@ public class GrafoJmap {
 //Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
     public GrafoJmap(FileManager f) {
         this.f = f;
+        this.start();
+    }
+
+    public void run(){
         this.coordenadas = f.getCordinates();
         grafoCompleto = toGrafo(coordenadas);
         aristasCompleto=toArista(grafoCompleto);
         AGM = Algoritmos.AGM(grafoCompleto);
         aristasAGM = toArista(AGM);
         aristasClusters = toArista(AGM);
-        
-       
-		
-      
     }
 
     //TODO este lo usaste para algun test tuyo agus, fijate si lo dejas o no
@@ -124,6 +124,7 @@ public class GrafoJmap {
             nuevoMarker.getStyle().setBackColor(color);
             miMapa.addMapMarker(nuevoMarker);
         }
+
         for (Arista v : this.aristasActuales)
             v.render(miMapa);
 
@@ -206,7 +207,7 @@ public class GrafoJmap {
         	 this.aristasActuales= aristasCompleto;
 
         }
-        else
+        else if(modo == GraphType.NINGUNA)
         	this.aristasActuales=new ArrayList<>();
 
 
