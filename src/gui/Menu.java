@@ -2,12 +2,14 @@ package gui;
 
 import gui.GrafoJmap.Cluster;
 import gui.GrafoJmap.GraphType;
+
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,14 +23,19 @@ import static javax.swing.JOptionPane.showInputDialog;
  */
 public class Menu extends JMapViewer implements ActionListener, ChangeListener {
 
-    private JFrame frame;
-    private JComboBox fileCombo, modeCombo;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JFrame frame;
+    @SuppressWarnings("rawtypes")
+	private JComboBox fileCombo, modeCombo;
     // private final ButtonGroup grupo = new ButtonGroup();
     private JCheckBox clusterCheck;
     private JRadioButton intelliRadio, maximoRadio, promedioRadio;
     private JButton start, exit, createInstance, aplicarButton;
     private JMapViewer miMapa;
-    private GraphType Modo = GrafoJmap.GraphType.AGM;
+  
     private Cluster modoCluster ;
     private File userFolder, projectDirectory;
     private FileManager fileManager;
