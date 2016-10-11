@@ -14,7 +14,11 @@ import java.util.List;
  */
 
 public class FileManager implements Serializable {
-    String nombre;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	String nombre;
     private ArrayList<Coordinate> cor = new ArrayList<>();
 
 

@@ -3,6 +3,7 @@ package gui;
 
 import grafos.Algoritmos;
 import grafos.GrafoPesado;
+
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
@@ -30,9 +31,7 @@ public class GrafoJmap extends Thread{
     private ArrayList<Arista> aristasClusters = new ArrayList<>();
     private ArrayList<Arista> aristasActuales = new ArrayList<Arista>();  //este swapea entre las distinas opciones de grafo
     private GrafoPesado grafoCompleto;
-    private Cluster modoCluster=Cluster.MAXIMO;
     private GrafoPesado AGM;
-    private int cantClusters=3;
     private JMapViewer miMapa;
 
     public enum GraphType{AGM,COMPLETO,CLUSTERS,NINGUNA;
@@ -52,9 +51,6 @@ public class GrafoJmap extends Thread{
 
     private String graphMode = "Completo";
 
-    private ArrayList<Coordinate> getCoordenadas() {
-        return coordenadas;
-    }
     public ArrayList<Arista> getDrawableAristas() {
         return aristasActuales;
     }
@@ -85,7 +81,7 @@ public class GrafoJmap extends Thread{
         this.coordenadas = f.getCordinates();
         this.render(miMapa);
         try {
-            currentThread().sleep(1000);
+			Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
