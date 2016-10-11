@@ -164,7 +164,10 @@ public class GrafoJmap extends Thread{
     }
 
     public void changeClusterMode(Cluster cluster , int cantClusters) {
-        aristasClusters=toArista(AGM);
+       
+    	//FIXME hacer que no crashee si supera la cabtudad de aristas
+    	
+    	aristasClusters=toArista(AGM);
 
         if(cluster==Cluster.MAXIMO){
             for( int i=0 ; i<cantClusters-1; i++){
