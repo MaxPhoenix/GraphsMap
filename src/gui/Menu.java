@@ -28,14 +28,13 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
 	 */
 	private static final long serialVersionUID = 1L;
 	private JFrame frame;
-    @SuppressWarnings("rawtypes")
-	private JComboBox fileCombo, modeCombo;
+	private JComboBox<String> fileCombo, modeCombo;
     // private final ButtonGroup grupo = new ButtonGroup();
     private JCheckBox clusterCheck;
     private JRadioButton intelliRadio, maximoRadio, promedioRadio;
     private JButton start, exit, createInstance, aplicarButton;
     private JMapViewer miMapa;
-  
+    GraphType Modo = GraphType.CLUSTERS;
     private Cluster modoCluster ;
     private File userFolder, projectDirectory;
     private FileManager fileManager;
@@ -100,7 +99,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         createInstance.addActionListener(this);
         frame.add(createInstance);
 
-        fileCombo = new JComboBox();
+        fileCombo = new JComboBox<String>();
         fileCombo.setBounds(0, 0, 200, 30);
         fileCombo.addActionListener(this);
         addFilestoComboBox();
@@ -109,7 +108,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
 
         //////////////////////////////////
 
-        modeCombo = new JComboBox();
+        modeCombo = new JComboBox<String>();
         modeCombo.addItem("Modo: Ninguna");
         modeCombo.addItem("Modo: AGM");
         modeCombo.addItem("Modo: Completo");
@@ -181,7 +180,8 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         }
     }
 
-    public static void main(String[] args) {
+    @SuppressWarnings("unused")
+	public static void main(String[] args) {
         Menu menu = new Menu();
     }
 
@@ -329,7 +329,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
     }
 
     private boolean isNumeroValido(String n){
-        boolean ret=true;
+        
         if(n == null){
             JOptionPane.showMessageDialog(this, "No ha seleccionado nada", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
