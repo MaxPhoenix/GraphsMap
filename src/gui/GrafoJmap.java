@@ -80,11 +80,13 @@ public class GrafoJmap extends Thread{
     public void run(){
         this.coordenadas = f.getCordinates();
         this.render(miMapa);
-        try {
-			Thread.sleep(1000);
+       /* try {
+			
+        	
+        	sleep();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         grafoCompleto = toGrafo(coordenadas);
         aristasCompleto=toArista(grafoCompleto);
         AGM = Algoritmos.AGM(grafoCompleto);
@@ -122,7 +124,10 @@ public class GrafoJmap extends Thread{
 
         for (Arista v : this.aristasActuales)
             v.render(miMapa);
-
+        
+       
+        
+        
 }
 
     public ArrayList<Arista> toArista(GrafoPesado gp) {
@@ -163,6 +168,7 @@ public class GrafoJmap extends Thread{
        
     	//FIXME hacer que no crashee si supera la cabtudad de aristas
     	
+    	//FIXME no dejar calcular clusters si todavia no termino de cargar 
     	aristasClusters=toArista(AGM);
 
         if(cluster==Cluster.MAXIMO){

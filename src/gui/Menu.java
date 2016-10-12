@@ -6,6 +6,8 @@ import gui.GrafoJmap.GraphType;
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
+import com.sun.glass.events.MouseEvent;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -13,6 +15,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -21,7 +25,7 @@ import static javax.swing.JOptionPane.showInputDialog;
 /**
  * Created by Max on 10/2/2016.
  */
-public class Menu extends JMapViewer implements ActionListener, ChangeListener {
+public class Menu extends JMapViewer implements ActionListener, ChangeListener, MouseListener {
 
     /**
 	 * 
@@ -164,8 +168,13 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         frame.add(aplicarButton);
         aplicarButton.setVisible(false);
 
-
+        miMapa.addMouseListener(this);
         frame.setVisible(true);
+        
+        System.out.println(miMapa.getMousePosition());
+        
+      
+	
 
     }
 
@@ -185,7 +194,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         Menu menu = new Menu();
     }
 
-
+//
     @Override
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() == clusterCheck) {
@@ -221,7 +230,12 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+    		
+    	
+    	
+    	
+    	
+    	
         if (menu) {
 
             if (e.getSource() == start) {
@@ -253,12 +267,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
                 menu = true;
                 Rectangle frameBounds = (frame.getBounds());
                 width = frameBounds.width;
-                height = frameBounds.height;
-                   /* frame.setResizable(false);
-                    start.setBounds((int) (width / 1.2), (int) (height / 1.2), 150, 50);
-                    exit.setBounds((int) (width / 1.2), (int) (height / 1.1), 150, 50);
-                    createInstance.setBounds(width / 3, height / 3, 400, 50);
-                    fileCombo.setBounds(width / 3, height / 2, 400, 50);*/
+                height = frameBounds.height;         
                 miMapa.removeAllMapMarkers();
                 miMapa.removeAllMapPolygons();
                 turnVisible(new Object[]{start, createInstance, fileCombo});
@@ -543,4 +552,37 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener {
         }
         return false;
     }
+
+	@Override
+	public void mouseClicked(java.awt.event.MouseEvent e) {
+		//TODO AGREGAR AL GRAFO Cuando se hace click en RECALCULAR
+		
+		if(!menu){
+		if(e.getButton()==1){
+			JGrafo.coordenadas.add(miMapa.getPosition(e.getPoint()));
+			JGrafo.render(miMapa);
+		}}
+	}
+
+	@Override
+	public void mouseEntered(java.awt.event.MouseEvent e) {
+	
+	}
+
+	@Override
+	public void mouseExited(java.awt.event.MouseEvent e) {
+	
+	}
+
+	@Override
+	public void mousePressed(java.awt.event.MouseEvent e) {
+	
+	}
+
+	@Override
+	public void mouseReleased(java.awt.event.MouseEvent e) {
+		
+	}
+
+
 }
