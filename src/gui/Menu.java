@@ -2,12 +2,14 @@ package gui;
 
 import gui.GrafoJmap.Cluster;
 import gui.GrafoJmap.GraphType;
+
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -50,7 +52,10 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
 
 
-    public Menu() {
+    
+
+
+	public Menu() {
         try {
             UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
@@ -248,6 +253,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
             if (e.getSource() == start) {
                 if (loadMap()) {
+                	modeCombo.setSelectedIndex(0);
                     menu = false;
                     frame.setResizable(true);
                     turnInvisible(new Object[]{start, createInstance, fileCombo});
@@ -306,7 +312,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         if (e.getSource() == modeCombo) {
 
             if ((modeCombo.getSelectedItem().toString().contains("AGM")) && !clusterCheck.isSelected()) {
-                if(!graphLoaded()){
+                if(!isGraphLoaded()){
                     JOptionPane.showMessageDialog(this, "no cargo todavia", "Error", JOptionPane.ERROR_MESSAGE);
                     modeCombo.setSelectedIndex(0);
                 }
@@ -318,7 +324,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                     Modo = GraphType.AGM;
                 }
             } else if (modeCombo.getSelectedItem().toString().contains("Completo")) {
-                if(!graphLoaded()){
+                if(!isGraphLoaded()){
                     JOptionPane.showMessageDialog(this, "no cargo todavia", "Error", JOptionPane.ERROR_MESSAGE);
                     modeCombo.setSelectedIndex(0);
                 }
@@ -406,9 +412,9 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
 
 
-    private boolean graphLoaded(){
-        boolean condition1 = JGrafo.getAgmLoaded();
-        boolean condition2 = JGrafo.getCompleteLoaded();
+    private boolean isGraphLoaded(){
+        boolean condition1 = JGrafo.isAgmLoaded();
+        boolean condition2 = JGrafo.isCompleteLoaded();
         return (condition1 && condition2);
     }
 
@@ -446,6 +452,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             return false;
         }
         else {
+        	//TODO CREAR UN ARCHIVO VACIO
             String cant = (showInputDialog(this, "cuantas ingresas?"));
 
             if(cant == null || !isInteger(cant)){
@@ -528,10 +535,27 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         }
         fileManager = new FileManager(opcion);
         fileManager.setCordinates(fileManager.retrieveCoordinates());
+        
+        if(fileManager.isArchivoCorrupto()){
+        	JOptionPane.showMessageDialog(this, "Archivo Corrupto, generando instancia vacia... ", "Error", JOptionPane.ERROR_MESSAGE);
+        	edited=true;
+        }
+        
         JGrafo = new GrafoJmap(fileManager,miMapa);
-        JGrafo.render(miMapa);
-        miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
-
+       while(!isGraphLoaded()){
+    	   try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	  
+    	   
+       }
+        
+        if(fileManager.getCordinates().size()!=0)
+        	miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
+        
 
         return true;
     }

@@ -19,6 +19,7 @@ public class FileManager implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	String nombre;
+	boolean archivoCorrupto=false;
     private ArrayList<Coordinate> cor = new ArrayList<>();
 
 
@@ -80,9 +81,19 @@ public class FileManager implements Serializable {
         try{
             if(f.exists() == true ) {
                 Type tipoCoordenada = new TypeToken<List<Coordenada>>() {}.getType();
-                List<Coordenada> coordenada = gson.fromJson(new FileReader(this.nombre), tipoCoordenada);
+                List<Coordenada> coordenada;
+                try{
+                coordenada = gson.fromJson(new FileReader(this.nombre), tipoCoordenada);}
+                catch(Exception e){
+                	 System.out.println("Archivo corrupto, generando instancia vacia");
+                	  archivoCorrupto=true;
+                	return coordenadas;
+                	
+                }
                 if (coordenada == null)
                     System.out.println("Archivo vacio, creando uno nuevo...");
+     
+                
                 else
                     for (Coordenada c : coordenada)
                         coordenadas.add(new Coordinate(c.getLat(), c.getLon()));
@@ -103,7 +114,15 @@ public class FileManager implements Serializable {
     }
 
 
-    public void storeCoordinates(String dirName,String fileName) {
+    public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public boolean isArchivoCorrupto() {
+		return archivoCorrupto;
+	}
+
+	public void storeCoordinates(String dirName,String fileName) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         ArrayList<Coordenada> storage = new ArrayList<Coordenada>();
 

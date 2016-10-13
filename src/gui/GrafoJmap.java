@@ -60,8 +60,8 @@ public class GrafoJmap extends Thread{
 
     public ArrayList<Coordinate> getCoordenadas (){ return coordenadas;}
 
-    public boolean getCompleteLoaded(){ return completeLoaded;}
-    public boolean getAgmLoaded(){ return agmLoaded;}
+    public boolean isCompleteLoaded(){ return completeLoaded;}
+    public boolean isAgmLoaded(){ return agmLoaded;}
 
 
     //Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
@@ -81,11 +81,6 @@ public class GrafoJmap extends Thread{
     public void run(){
         this.coordenadas = f.getCordinates();
         this.render(miMapa);
-       /* try {
-        	sleep();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
 
         grafoCompleto = toGrafo(coordenadas);
         aristasCompleto=toArista(grafoCompleto);
@@ -94,6 +89,7 @@ public class GrafoJmap extends Thread{
         aristasAGM = toArista(AGM);
         aristasClusters = toArista(AGM);
         agmLoaded = true;
+        this.render(miMapa);
     }
 
 
