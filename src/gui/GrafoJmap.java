@@ -3,7 +3,6 @@ package gui;
 
 import grafos.Algoritmos;
 import grafos.GrafoPesado;
-
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
@@ -22,10 +21,6 @@ public class GrafoJmap extends Thread{
 
     public ArrayList<Coordinate> coordenadas = new ArrayList<>();
 
-    public ArrayList<Arista> getAristasAGM() {
-        return aristasAGM;
-    }
-
     private ArrayList<Arista> aristasAGM = new ArrayList<>();
     private ArrayList<Arista> aristasCompleto = new ArrayList<>();
     private ArrayList<Arista> aristasClusters = new ArrayList<>();
@@ -33,6 +28,9 @@ public class GrafoJmap extends Thread{
     private GrafoPesado grafoCompleto;
     private GrafoPesado AGM;
     private JMapViewer miMapa;
+    private boolean agmLoaded, completeLoaded;
+
+
 
     public enum GraphType{AGM,COMPLETO,CLUSTERS,NINGUNA;
     @Override
@@ -50,10 +48,8 @@ public class GrafoJmap extends Thread{
     }
 
     private String graphMode = "Completo";
+    public String getMode(){return this.graphMode;}
 
-    public ArrayList<Arista> getDrawableAristas() {
-        return aristasActuales;
-    }
     public GrafoPesado getGrafoCompleto() {
         return grafoCompleto;
     }
@@ -61,9 +57,22 @@ public class GrafoJmap extends Thread{
         return AGM;
     }
 
-    public String getMode(){return this.graphMode;}
+    public ArrayList<Arista> getDrawableAristas() {
+        return aristasActuales;
+    }
+    public ArrayList<Arista> getAristasCompleto() {
+        return aristasCompleto;
+    }
+    public ArrayList<Arista> getAristasAGM() {
+        return aristasAGM;
+    }
+    public ArrayList<Arista> getAristasClusters() { return aristasClusters; }
 
-//Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
+    public boolean getCompleteLoaded(){ return completeLoaded;}
+    public boolean getAgmLoaded(){ return agmLoaded;}
+
+
+    //Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
     public GrafoJmap(FileManager f,JMapViewer miMapa) {
         this.f = f;
         this.miMapa=miMapa;
@@ -81,17 +90,18 @@ public class GrafoJmap extends Thread{
         this.coordenadas = f.getCordinates();
         this.render(miMapa);
        /* try {
-			
-        	
         	sleep();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }*/
+
         grafoCompleto = toGrafo(coordenadas);
         aristasCompleto=toArista(grafoCompleto);
+        completeLoaded = true;
         AGM = Algoritmos.AGM(grafoCompleto);
         aristasAGM = toArista(AGM);
         aristasClusters = toArista(AGM);
+        agmLoaded = true;
     }
 
 
@@ -124,10 +134,7 @@ public class GrafoJmap extends Thread{
 
         for (Arista v : this.aristasActuales)
             v.render(miMapa);
-        
-       
-        
-        
+
 }
 
     public ArrayList<Arista> toArista(GrafoPesado gp) {
@@ -140,8 +147,9 @@ public class GrafoJmap extends Thread{
             for (Integer j : vecinos) {
                 Coordinate cor2 = coordenadas.get(j);
                 Arista arista = new Arista(cor1, cor2);
-                if (!ret.contains(arista))
+                if (!ret.contains(arista)) {
                     ret.add(arista);
+                }
             }
         }
 
@@ -164,12 +172,12 @@ public class GrafoJmap extends Thread{
         return aristasActuales;
     }
 
-    public void changeClusterMode(Cluster cluster , int cantClusters) {
-       
-    	//FIXME hacer que no crashee si supera la cabtudad de aristas
-    	
-    	//FIXME no dejar calcular clusters si todavia no termino de cargar 
-    	aristasClusters=toArista(AGM);
+    public void changeClusterMode(Cluster cluster , int cantClusters) throws  IllegalArgumentException{
+
+        if(cantClusters > aristasAGM.size())
+            throw new IllegalArgumentException("argumento mayor a la cant aristas");
+
+        aristasClusters=toArista(AGM);
 
         if(cluster==Cluster.MAXIMO){
             for( int i=0 ; i<cantClusters-1; i++){
@@ -218,6 +226,8 @@ public class GrafoJmap extends Thread{
         System.out.println("Cambio de modo a " + modo );
 
     }
+
+
 
 
 
