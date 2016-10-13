@@ -15,7 +15,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 
-import static javax.swing.JOptionPane.showInputDialog;
+import static javax.swing.JOptionPane.*;
 
 /**
  * Created by Max on 10/2/2016.
@@ -28,10 +28,11 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 	private static final long serialVersionUID = 1L;
 	private JFrame frame;
 	private JComboBox<String> fileCombo, modeCombo;
+    private int indexCombo;
     // private final ButtonGroup grupo = new ButtonGroup();
     private JCheckBox clusterCheck;
     private JRadioButton intelliRadio, maximoRadio, promedioRadio;
-    private JButton start, exit, createInstance, aplicarButton, stadistics;
+    private JButton start, exit, createInstance, aplicarButton, stadistics, edit, noEdit;
     private JMapViewer miMapa;
     GraphType Modo ;
     private Cluster modoCluster ;
@@ -44,6 +45,9 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     private int projectDirectorySize = 0;
     private boolean edition = false;
     private Integer clusterInput = 0;
+    private boolean edited = false;
+
+
 
 
     public Menu() {
@@ -165,11 +169,23 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         frame.add(aplicarButton);
         aplicarButton.setVisible(false);
 
-        stadistics = new JButton("Editar");
-        stadistics.setBounds((int) (width / 1.5) + offset, 0, 85, 30);
+        stadistics = new JButton("Mostrar estadisticas");
+        stadistics.setBounds((int) (width / 1.5) + offset, 0, 150, 30);
         stadistics.addActionListener(this);
         frame.add(stadistics);
         stadistics.setVisible(false);
+
+        edit = new JButton("Modo edicion");
+        edit.setBounds((int) (width / 1.5) + offset, (int)(height/20), 100, 30);
+        edit.addActionListener(this);
+        frame.add(edit);
+        edit.setVisible(false);
+
+        noEdit = new JButton("Fin modo edicion");
+        noEdit.setBounds((int) (width / 1.5) + offset, (int)(height/17), 150, 30);
+        noEdit.addActionListener(this);
+        frame.add( noEdit);
+        noEdit.setVisible(false);
 
         miMapa.addMouseListener(this);
         frame.setVisible(true);
@@ -235,7 +251,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                     menu = false;
                     frame.setResizable(true);
                     turnInvisible(new Object[]{start, createInstance, fileCombo});
-                    turnVisible(new Object[]{modeCombo,stadistics});
+                    turnVisible(new Object[]{modeCombo,stadistics,edit});
                 }
             }
 
@@ -244,7 +260,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                     menu = false;
                     frame.setResizable(true);
                     turnInvisible(new Object[]{start, createInstance, fileCombo,stadistics});
-                    turnVisible(new Object[]{modeCombo});
+                    turnVisible(new Object[]{modeCombo,edit});
                 }
             }
 
@@ -255,6 +271,21 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         else {
             selecciondeModo(e);
             if (e.getSource() == exit) {
+                if(edited == true){
+                    int saveOption = JOptionPane.showConfirmDialog(this,"Se han detectado cambios en la instancia, desea guardarlos?","Cambios", YES_NO_OPTION);
+                    if (saveOption == YES_OPTION) {
+                        String name = JOptionPane.showInputDialog(this, "Ingrese el nombre del archivo a guardar", "File Name");
+                        while (isInvalidName(name)) {
+                            JOptionPane.showMessageDialog(this, "no se puede dividir el grafo en mas grupos que aristas", "Error", JOptionPane.ERROR_MESSAGE);
+                            name = JOptionPane.showInputDialog(this, "Ingrese el nombre del archivo a guardar", "File Name");
+                        }
+                        saveChanges(name);
+                        edited = false;
+                        addFilestoComboBox();
+                        }
+                        else if (saveOption == NO_OPTION || saveOption == CLOSED_OPTION)
+                            JOptionPane.showMessageDialog(this, "No se guardaron las instancias", "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 menu = true;
                 Rectangle frameBounds = (frame.getBounds());
                 width = frameBounds.width;
@@ -262,7 +293,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 miMapa.removeAllMapMarkers();
                 miMapa.removeAllMapPolygons();
                 turnVisible(new Object[]{start, createInstance, fileCombo});
-                turnInvisible(new Object[]{modeCombo, intelliRadio, maximoRadio, promedioRadio, clusterCheck, aplicarButton,stadistics});
+                turnInvisible(new Object[]{modeCombo, intelliRadio, maximoRadio, promedioRadio, clusterCheck, aplicarButton,stadistics,edit,noEdit});
                 clusterInput = 0;
                 Modo = GraphType.NINGUNA;
                 modoCluster = Cluster.INTELIGENTE;
@@ -350,6 +381,25 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
         }
 
+        if(e.getSource() == edit) {
+
+            indexCombo = modeCombo.getSelectedIndex();
+            modeCombo.setSelectedIndex(0);
+            edition = true;
+            JOptionPane.showMessageDialog(null, "Entrando en modo edicion. Haga click donde desee ingresar coordenadas.");
+            turnInvisible(new Object[] {edit, modeCombo});
+            noEdit.setVisible(true);
+
+        }
+
+        if(e.getSource() == noEdit){
+            modeCombo.setSelectedIndex(indexCombo);
+            JOptionPane.showMessageDialog(null, "Finalizando modo edicion");
+            edition = false;
+            turnVisible(new Object[] {edit, modeCombo});
+            noEdit.setVisible(false);
+        }
+
 
         JGrafo.render(miMapa);
     }
@@ -389,7 +439,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     private boolean createMap() {
         //cartel para ingreso de coordenadas
         Integer cantCoordenadas = 0;
-        String nombre = showInputDialog(this,"nombre del archivo? se guardara en "+ userFolder.getAbsolutePath())+".json";
+        String nombre = showInputDialog(this,"nombre del archivo?, se guardara en "+ userFolder.getAbsolutePath())+".json";
 
         if(nombre.equals("null.json")  || nombre.equals(".json") || isInvalidName(nombre)){
             JOptionPane.showMessageDialog(this, "Ingrese un nombre valido de archivo", "Error", JOptionPane.ERROR_MESSAGE);
@@ -572,15 +622,32 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         return false;
     }
 
+
+
+    private void saveChanges(String nombre){
+        //arreglo de coordinates para guradar
+        fileCoordinates = JGrafo.getCoordenadas();
+        //crea un filemanager que guarda como coordinates el arreglo de coordenada creado arriba
+        fileManager = new FileManager(userFolder.getAbsolutePath() + "\\" + nombre);
+        fileManager.setCordinates(fileCoordinates);
+        //cambie la funcion store coordinates para que guarde un directorio
+        fileManager.storeCoordinates();
+    }
+
 	@Override
 	public void mouseClicked(java.awt.event.MouseEvent e) {
 		//TODO AGREGAR AL GRAFO Cuando se hace click en RECALCULAR
 		
 		if(!menu){
-		if(e.getButton()==1){
-			JGrafo.coordenadas.add(miMapa.getPosition(e.getPoint()));
-			JGrafo.render(miMapa);
-		}}
+            if (e.getButton() == 1) {
+
+                if(edition == true) {
+                    JGrafo.getCoordenadas().add(miMapa.getPosition(e.getPoint()));
+                    JGrafo.render(miMapa);
+                    edited = true;
+                }
+            }
+		}
 	}
 
 	@Override

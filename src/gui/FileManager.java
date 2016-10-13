@@ -34,6 +34,7 @@ public class FileManager implements Serializable {
         return cor;
     }
 
+
     public void setCor(ArrayList<Coordinate> cor) {
         this.cor = cor;
     }

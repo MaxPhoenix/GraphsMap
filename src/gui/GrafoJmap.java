@@ -19,7 +19,7 @@ import java.util.Set;
 public class GrafoJmap extends Thread{
      FileManager f;
 
-    public ArrayList<Coordinate> coordenadas = new ArrayList<>();
+    private ArrayList<Coordinate> coordenadas = new ArrayList<>();
 
     private ArrayList<Arista> aristasAGM = new ArrayList<>();
     private ArrayList<Arista> aristasCompleto = new ArrayList<>();
@@ -53,20 +53,12 @@ public class GrafoJmap extends Thread{
     public GrafoPesado getGrafoCompleto() {
         return grafoCompleto;
     }
-    public GrafoPesado getAGM() {
-        return AGM;
-    }
 
-    public ArrayList<Arista> getDrawableAristas() {
-        return aristasActuales;
-    }
-    public ArrayList<Arista> getAristasCompleto() {
-        return aristasCompleto;
-    }
     public ArrayList<Arista> getAristasAGM() {
         return aristasAGM;
     }
-    public ArrayList<Arista> getAristasClusters() { return aristasClusters; }
+
+    public ArrayList<Coordinate> getCoordenadas (){ return coordenadas;}
 
     public boolean getCompleteLoaded(){ return completeLoaded;}
     public boolean getAgmLoaded(){ return agmLoaded;}
