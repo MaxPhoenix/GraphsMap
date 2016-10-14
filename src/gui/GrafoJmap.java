@@ -73,12 +73,23 @@ public class GrafoJmap extends Thread{
         this.f = f;
         this.miMapa=men.getMiMapa();
         this.menu=men;
+        this.coordenadas = f.getCordinates();
         this.start();
 
     }
+    public GrafoJmap(ArrayList<Coordinate> bkp, Menu men) {
+        this.f = f;
+        this.coordenadas=bkp;
+        this.miMapa=men.getMiMapa();
+        this.menu=men;
+        this.start();
+
+    }
+
+
     public GrafoJmap(FileManager f) {
         this.f = f;
-
+        this.coordenadas = f.getCordinates();
         this.start();
 
     }
@@ -86,7 +97,7 @@ public class GrafoJmap extends Thread{
     @SuppressWarnings("unchecked")
 	public void run(){
     	menu.setProgress("Cargando Coordenadas",0);
-    	this.coordenadas = f.getCordinates();
+
 
         if(!isInterrupted())
             grafoCompleto = toGrafo(coordenadas);

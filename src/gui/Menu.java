@@ -2,19 +2,19 @@ package gui;
 
 import gui.GrafoJmap.Cluster;
 import gui.GrafoJmap.GraphType;
-
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static javax.swing.JOptionPane.*;
@@ -35,7 +35,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     private JCheckBox clusterCheck;
     private JRadioButton intelliRadio, maximoRadio, promedioRadio;
     private static JProgressBar progressBar;
-    private JButton start, exit, createInstance, mostrar,aplicarButton, stadistics, edit, noEdit;
+    private JButton start, exit, createInstance, aplicarButton, stadistics, edit, noEdit;
     private static JMapViewer miMapa;
     GraphType Modo ;
     private Cluster modoCluster ;
@@ -84,7 +84,13 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     public void initialize() {
 
         frame = new JFrame("TPJmapViewer");
+        try {
+            frame.setIconImage(ImageIO.read(new File("librerias/map.png")));
+        }
 
+        catch (IOException exc) {
+            exc.printStackTrace();
+        }
         frame.setLocationRelativeTo(null);
         frame.setBounds(100, 100, width, height);
 
@@ -114,12 +120,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         frame.add(createInstance);
 
         
-        
-        mostrar = new JButton("mostrar");
-        mostrar.setBounds(0, 35, 200, 30);
-        mostrar.addActionListener(this);
-        frame.add(mostrar);
-        mostrar.setVisible(false);
+
 
         fileCombo = new JComboBox<String>();
         fileCombo.setBounds(0, 0, 200, 30);
@@ -276,11 +277,12 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         	
             if (e.getSource() == start) {
                 if (loadMap()) {
+                    exit.setText("Cancel");
                 	modeCombo.setSelectedIndex(0);
                     menu = false;
                     frame.setResizable(true);
                     turnInvisible(new Object[]{start, createInstance, fileCombo });
-                    turnVisible(new Object[]{modeCombo,stadistics,edit,mostrar});
+                    turnVisible(new Object[]{modeCombo,stadistics,edit});
                 }
             }
 
@@ -289,7 +291,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                     menu = false;
                     frame.setResizable(true);
                     turnInvisible(new Object[]{start, createInstance, fileCombo,stadistics});
-                    turnVisible(new Object[]{modeCombo,edit,mostrar});
+                    turnVisible(new Object[]{modeCombo,edit});
                 }
             }
 
@@ -317,9 +319,8 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                             JOptionPane.showMessageDialog(this, "No se guardaron las instancias", "Error", JOptionPane.ERROR_MESSAGE);
                 
                 }
-               // JGrafo.setInterrupt(true);
-                
-              //  System.out.print(JGrafo.isInterrupt() +""+JGrafo.isInterrupted());
+                JGrafo.interrupt();
+                setProgress("Interrupted",100);
                 menu = true;
                 Rectangle frameBounds = (frame.getBounds());
                 width = frameBounds.width;
@@ -327,11 +328,11 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 miMapa.removeAllMapMarkers();
                 miMapa.removeAllMapPolygons();
                 turnVisible(new Object[]{start, createInstance, fileCombo});
-                turnInvisible(new Object[]{modeCombo, intelliRadio, maximoRadio, promedioRadio, clusterCheck, aplicarButton,stadistics,edit,noEdit, mostrar});
-                setProgress("",0);
+                turnInvisible(new Object[]{modeCombo, intelliRadio, maximoRadio, promedioRadio, clusterCheck, aplicarButton,stadistics,edit,noEdit,progressBar});
                 clusterInput = 0;
                 Modo = GraphType.NINGUNA;
                 modoCluster = Cluster.INTELIGENTE;
+
             }
         }
     }
@@ -420,29 +421,42 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
         }
 
+
+        JGrafo.render();
+
+
         if(e.getSource() == noEdit){
             modeCombo.setSelectedIndex(indexCombo);
+
             JOptionPane.showMessageDialog(null, "Finalizando modo edicion");
             edition = false;
             turnVisible(new Object[] {edit, modeCombo});
             noEdit.setVisible(false);
+
+
+            ArrayList<Coordinate> bkp=JGrafo.getCoordenadas();
+            JGrafo= new GrafoJmap(bkp,this);
+            edited=false;
         }
 
-        	if (e.getSource() == mostrar) {
-                 if(JGrafo.getCoordenadas().size()>0)
-                     miMapa.setDisplayPositionByLatLon(JGrafo.getCoordenadas().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
-        	 }
-
-        JGrafo.render();
     }
 
+private void render(){
+    if(JGrafo.getCoordenadas().size()>0)
+        miMapa.setDisplayPositionByLatLon(JGrafo.getCoordenadas().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
+    JGrafo.render();
 
+}
 
     private boolean isGraphLoaded(){
         boolean condition1 = JGrafo.isAgmLoaded();
         boolean condition2 = true;
         return (condition1 && condition2);
     }
+
+
+
+
 
 
     private boolean isNumeroValido(String n){
@@ -584,6 +598,14 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         if(p==100){
             progressBar.setVisible(false);
             frame.setTitle("TPJmapViewer");
+            exit.setText("Exit");
+            if(!JGrafo.isInterrupted()){
+                JGrafo.interrupt();
+            }
+            if(JGrafo.isInterrupted()){
+                render();
+            }
+            return;
         }
         progressBar.setString(titulo);
         progressBar.setValue(p);
