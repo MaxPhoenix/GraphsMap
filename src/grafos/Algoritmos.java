@@ -20,7 +20,6 @@ public class Algoritmos
 			if(i%2==0)
 				Menu.setProgress("Calculando AGM...",(i*100)/grafo.vertices()-1);
 
-
 		}
 		
 		return GRAFO;
@@ -88,13 +87,13 @@ public class Algoritmos
 		static Arista menorArista(GrafoPesado grafo,Integer actual,Set<Integer> visitados ){
 			Arista ret = new Arista(0, 0, Double.MAX_VALUE);
 
-
-				for (Integer j : grafo.vecinos(actual)){
-					if( visitados.contains(j) == false ){
-						if( grafo.getPeso(actual, j) < ret.peso ){
-							ret = new Arista(actual, j, grafo.getPeso(actual, j));}
-
-					}}
+			for (Integer j : grafo.vecinos(actual)){
+				if( visitados.contains(j) == false ){
+					if( grafo.getPeso(actual, j) < ret.peso ){
+						ret = new Arista(actual, j, grafo.getPeso(actual, j));
+					}
+				}
+			}
 			return ret;
 		}
 

@@ -67,14 +67,13 @@ public class GrafoJmap extends Thread{
         return Integer.toString(cantClusters);
     }
 
-
     public ArrayList<Coordinate> getCoordenadas (){ return coordenadas;}
 
     public boolean isCompleteLoaded(){ return completeLoaded;}
     public boolean isAgmLoaded(){ return agmLoaded;}
 
 
-    //Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
+
     public GrafoJmap(FileManager f, Menu men) {
         this.f = f;
         this.miMapa=men.getMiMapa();
@@ -84,7 +83,6 @@ public class GrafoJmap extends Thread{
 
     }
     public GrafoJmap(ArrayList<Coordinate> bkp, Menu men) {
-        this.f = f;
         this.coordenadas=bkp;
         this.miMapa=men.getMiMapa();
         this.menu=men;
@@ -128,8 +126,6 @@ public class GrafoJmap extends Thread{
         agmLoaded = true;
         menu.setProgress("Completado",100);
 
-
- 
     }
 
 
@@ -189,8 +185,6 @@ public class GrafoJmap extends Thread{
                 if (!ret.contains(arista)) {
                     ret.add(arista);
                     aristas++;
-                    
-              
                 }
             }
 
@@ -206,6 +200,7 @@ public class GrafoJmap extends Thread{
     public boolean iscancelInterrupted(){
         return this.isInterrupted();
     }
+
     public GrafoPesado toGrafo(ArrayList<Coordinate> list) {
         GrafoPesado grafo = new GrafoPesado(list.size());
         for (int i = 0; i < list.size(); i++) {
