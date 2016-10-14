@@ -3,7 +3,6 @@ package gui;
 
 import grafos.Algoritmos;
 import grafos.GrafoPesado;
-
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
@@ -30,7 +29,10 @@ public class GrafoJmap extends Thread{
     private GrafoPesado AGM;
     private JMapViewer miMapa;
     private Double aristas=0D;
+    private Menu menu;
+
     private boolean agmLoaded, completeLoaded;
+
 
 
 
@@ -49,8 +51,8 @@ public class GrafoJmap extends Thread{
     public enum Cluster{MAXIMO,PROMEDIO,INTELIGENTE;
     }
 
-    private String graphMode = "Completo";
-    public String getMode(){return this.graphMode;}
+
+
 
     public GrafoPesado getGrafoCompleto() {
         return grafoCompleto;
@@ -67,9 +69,10 @@ public class GrafoJmap extends Thread{
 
 
     //Constructor con todos los tipos de grafos creados con sus respectivas aristas pereparadas para su uso de ser necesario
-    public GrafoJmap(FileManager f,JMapViewer miMapa) {
+    public GrafoJmap(FileManager f, Menu men) {
         this.f = f;
-        this.miMapa=miMapa;
+        this.miMapa=men.getMiMapa();
+        this.menu=men;
         this.start();
 
     }
@@ -82,23 +85,29 @@ public class GrafoJmap extends Thread{
 
     @SuppressWarnings("unchecked")
 	public void run(){
-    	Menu.setProgress("Cargando Coordenadas",0);
+    	menu.setProgress("Cargando Coordenadas",0);
     	this.coordenadas = f.getCordinates();
-       
-        grafoCompleto = toGrafo(coordenadas);
-        aristasCompleto=toArista(grafoCompleto);
-       
-        completeLoaded = true;
-        AGM = Algoritmos.AGM(grafoCompleto);
-        aristasAGM = toArista(AGM);
+
+        if(!isInterrupted())
+            grafoCompleto = toGrafo(coordenadas);
+        if(!isInterrupted())
+            aristasCompleto=toArista(grafoCompleto);
+
+        if(!isInterrupted())
+            AGM = Algoritmos.AGM(grafoCompleto,menu);
+        if(!isInterrupted())
+            aristasAGM = toArista(AGM);
+        else{
+            return;
+        }
+
         aristasClusters = (ArrayList<Arista>) aristasAGM.clone();
         agmLoaded = true;
-        Menu.setProgress("",100);
+        menu.setProgress("Completado",100);
+
+
  
     }
-
-
-
 
 
     public static double distFrom(Coordinate cor1, Coordinate cor2) {
@@ -116,7 +125,7 @@ public class GrafoJmap extends Thread{
     }
 
 //ahora render dibuja las aristas en base al modo ya cambiado anteriormente
-    public void render(JMapViewer miMapa ) {
+    public void render() {
         Color color = Color.RED;
 
         for (Coordinate c : coordenadas) {
@@ -138,6 +147,11 @@ public class GrafoJmap extends Thread{
             Coordinate cor1 = coordenadas.get(i);
 
             for (Integer j : vecinos) {
+                if(isInterrupted()){
+                    this.interrupt();
+
+                    return new ArrayList<Arista>();
+                }
                 Coordinate cor2 = coordenadas.get(j);
                 Arista arista = new Arista(cor1, cor2);
                 if (!ret.contains(arista)) {
@@ -147,7 +161,8 @@ public class GrafoJmap extends Thread{
               
                 }
             }
-            Menu.setProgress("Generando Aristas...",(i*100)/gp.vertices());
+
+            menu.setProgress("Generando Aristas...",(i*100)/gp.vertices());
             
             
             
@@ -156,14 +171,18 @@ public class GrafoJmap extends Thread{
         return ret;
     }
 
+    public boolean iscancelInterrupted(){
+        return this.isInterrupted();
+    }
     public GrafoPesado toGrafo(ArrayList<Coordinate> list) {
         GrafoPesado grafo = new GrafoPesado(list.size());
         for (int i = 0; i < list.size(); i++) {
-            for (int j = 0; j < list.size(); j++) {
+            for (int j = i; j < list.size(); j++) {
                 if (i != j)
                     grafo.agregarArista(i, j, distFrom(list.get(i), list.get(j)));
-                Menu.setProgress("Cargando Grafo...",(i*100)/list.size());
+
             }
+            menu.setProgress("Cargando Grafo...",(i*100)/list.size());
         }
         return grafo;
 
@@ -178,7 +197,7 @@ public class GrafoJmap extends Thread{
         if(cantClusters > aristasAGM.size())
             throw new IllegalArgumentException("argumento mayor a la cant aristas");
 
-        aristasClusters=toArista(AGM);
+        aristasClusters= (ArrayList<Arista>) aristasAGM.clone();
 
         if(cluster==Cluster.MAXIMO){
             for( int i=0 ; i<cantClusters-1; i++){
@@ -203,7 +222,7 @@ public class GrafoJmap extends Thread{
         }
 
         aristasActuales=aristasClusters;
-
+        menu.setProgress("Completado",100);
     }
 
     //este metodo cambia el modo de grafo entre completo, agm y clusters
@@ -227,9 +246,6 @@ public class GrafoJmap extends Thread{
         System.out.println("Cambio de modo a " + modo );
 
     }
-
-
-
 
 
 }

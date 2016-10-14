@@ -84,6 +84,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     public void initialize() {
 
         frame = new JFrame("TPJmapViewer");
+
         frame.setLocationRelativeTo(null);
         frame.setBounds(100, 100, width, height);
 
@@ -205,13 +206,13 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         miMapa.addMouseListener(this);
         frame.setVisible(true);
         
-        System.out.println(miMapa.getMousePosition());
+
         progressBar = new JProgressBar();
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
-        progressBar.setVisible(true);
+        progressBar.setVisible(false);
         progressBar.setBounds(this.width/2,this.height/2, 150, 30);
-       
+
         Container content = frame.getContentPane();
         content.add(progressBar, BorderLayout.NORTH);
         
@@ -272,10 +273,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
         if (menu) {
 
-        	 if (e.getSource() == mostrar) {
-        		 JGrafo.render(miMapa);
-        		 
-        	 }
         	
             if (e.getSource() == start) {
                 if (loadMap()) {
@@ -331,6 +328,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 miMapa.removeAllMapPolygons();
                 turnVisible(new Object[]{start, createInstance, fileCombo});
                 turnInvisible(new Object[]{modeCombo, intelliRadio, maximoRadio, promedioRadio, clusterCheck, aplicarButton,stadistics,edit,noEdit, mostrar});
+                setProgress("",0);
                 clusterInput = 0;
                 Modo = GraphType.NINGUNA;
                 modoCluster = Cluster.INTELIGENTE;
@@ -378,19 +376,12 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         }
 
         if(e.getSource() == stadistics){
-            JOptionPane.showMessageDialog(null, "Modo : "+ Modo + "Cantidad de Aristas:\n"+ JGrafo.getAristasActuales().size() + "\n Cantidad de clusters : "+ clusterInput);
+            JOptionPane.showMessageDialog(null,"Modo : \n"+ Modo + "\nCantidad de Vertices:\n"+JGrafo.getCoordenadas().size()+ "\nCantidad de Aristas:\n"+ JGrafo.getAristasActuales().size() + "\n Cantidad de clusters : \n"+ clusterInput);
         }
 
         if (e.getSource() == aplicarButton) {
 
-            if(intelliRadio.isSelected()){
-                miMapa.removeAllMapMarkers();
-                miMapa.removeAllMapPolygons();
-                JGrafo.changeClusterMode(modoCluster, 0);
-                JGrafo.changeMode(GraphType.CLUSTERS);
-                JGrafo.render(miMapa);
-                return;
-            }
+
             String n = JOptionPane.showInputDialog(this, "Ingrese la cantidad de clusters");
             if(isNumeroValido(n)){
 
@@ -437,15 +428,19 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             noEdit.setVisible(false);
         }
 
+        	if (e.getSource() == mostrar) {
+                 if(JGrafo.getCoordenadas().size()>0)
+                     miMapa.setDisplayPositionByLatLon(JGrafo.getCoordenadas().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
+        	 }
 
-        JGrafo.render(miMapa);
+        JGrafo.render();
     }
 
 
 
     private boolean isGraphLoaded(){
         boolean condition1 = JGrafo.isAgmLoaded();
-        boolean condition2 = JGrafo.isCompleteLoaded();
+        boolean condition2 = true;
         return (condition1 && condition2);
     }
 
@@ -526,7 +521,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 fileManager.storeCoordinates();
 
                 fileManager.setCordinates(fileManager.retrieveCoordinates());
-                JGrafo = new GrafoJmap(fileManager,miMapa);
+                JGrafo = new GrafoJmap(fileManager,this);
                 //JGrafo.render(miMapa);
                 miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
             }
@@ -572,24 +567,31 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         	edited=true;
         }
         
-        JGrafo = new GrafoJmap(fileManager,miMapa);
+        JGrafo = new GrafoJmap(fileManager,this);
         
 
-        /*
-        if(fileManager.getCordinates().size()!=0)
-        	miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
-        */
 
         return true;
     }
 
-    public void Render(){
-    	JGrafo.render(miMapa);
+
+    public static JMapViewer getMiMapa() {
+        return miMapa;
     }
-    
-    
-    
-    
+
+    public void setProgress(String titulo, int p){
+        progressBar.setVisible(true);
+        if(p==100){
+            progressBar.setVisible(false);
+            frame.setTitle("TPJmapViewer");
+        }
+        progressBar.setString(titulo);
+        progressBar.setValue(p);
+        frame.setTitle("TPJmapViewer:    "+titulo+" "+p+"%");
+
+
+    }
+
     private void turnVisible(Object[] obj){
         for(Object object: obj){
             if (object instanceof JComponent){
@@ -608,33 +610,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         }
     }
 
-    public static void setProgress(String titulo,int p){
-    	if(p==100){
-    		progressBar.setVisible(false);
-    		//JGrafo.render(miMapa);    
-    	}
-    	progressBar.setString(titulo);
-    	progressBar.setValue(p);
-    		
-    }
-    public static void setProgress(int p){
-    	if(p==100){
-    		progressBar.setVisible(false);
-    	
-    	}
-
-    	progressBar.setValue(p);
-    	
-    	
-    }
-    
-    
-    
-
-
-	public void setLoadingStatus(String loadingStatus) {
-		this.loadingStatus = loadingStatus;
-	}
 
 	private Coordenada getUserCoordinate(String cantCords) {
         JTextField field1 = new JTextField();
@@ -695,6 +670,8 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     }
 
     private boolean isInvalidName(String s){
+        if(s==null)
+            return true;
         String nonCharacters = "@+-.,_/(&%$#!|°*\\=)¨´^{}";
         for(int i = 0; i < s.length()-5;i++ ){
             char c =  s.charAt(i);
@@ -725,7 +702,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
                 if(edition == true) {
                     JGrafo.getCoordenadas().add(miMapa.getPosition(e.getPoint()));
-                    JGrafo.render(miMapa);
+                    JGrafo.render();
                     edited = true;
                 }
             }
@@ -752,5 +729,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 		
 	}
 
+    public JProgressBar getBar() {
+        return progressBar;}
 
 }

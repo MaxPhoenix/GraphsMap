@@ -8,7 +8,7 @@ import java.util.Set;
 public class Algoritmos
 {
 	// Algoritmo de Prim
-	public static GrafoPesado AGM(GrafoPesado grafo){
+	public static GrafoPesado AGM(GrafoPesado grafo,Menu Menu){
 		GrafoPesado GRAFO = new GrafoPesado(grafo.vertices());
 		Set<Integer> visitados = new HashSet<Integer>();
 		visitados.add(0); // Cualquiera
@@ -17,7 +17,8 @@ public class Algoritmos
 			Arista a = menorArista(grafo, visitados); // De un amarillo a un negro
 			GRAFO.agregarArista(a.origen, a.destino, a.peso);
 			visitados.add(a.destino);
-			Menu.setProgress("Calculando AGM...",(i*100)/grafo.vertices()-1);
+			if(i%2==0)
+				Menu.setProgress("Calculando AGM...",(i*100)/grafo.vertices()-1);
 		
 		}
 		

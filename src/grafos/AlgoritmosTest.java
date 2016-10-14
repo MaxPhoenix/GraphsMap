@@ -1,11 +1,13 @@
 package grafos;
 
-import static org.junit.Assert.*;
+import gui.Menu;
+import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AlgoritmosTest
 {
@@ -39,7 +41,7 @@ public class AlgoritmosTest
 	public void primTest()
 	{
 		GrafoPesado grafo = instancia();
-		GrafoPesado agm = Algoritmos.AGM(grafo);
+		GrafoPesado agm = Algoritmos.AGM(grafo,new Menu());
 		
 		assertTrue(agm.contieneArista(1, 2));
 		assertTrue(agm.contieneArista(1, 4));
