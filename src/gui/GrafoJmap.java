@@ -3,6 +3,7 @@ package gui;
 
 import grafos.Algoritmos;
 import grafos.GrafoPesado;
+
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
@@ -28,6 +29,7 @@ public class GrafoJmap extends Thread{
     private GrafoPesado grafoCompleto;
     private GrafoPesado AGM;
     private JMapViewer miMapa;
+    private Double aristas=0D;
     private boolean agmLoaded, completeLoaded;
 
 
@@ -78,18 +80,21 @@ public class GrafoJmap extends Thread{
 
     }
 
-    public void run(){
-        this.coordenadas = f.getCordinates();
-        this.render(miMapa);
-
+    @SuppressWarnings("unchecked")
+	public void run(){
+    	Menu.setProgress("Cargando Coordenadas",0);
+    	this.coordenadas = f.getCordinates();
+       
         grafoCompleto = toGrafo(coordenadas);
         aristasCompleto=toArista(grafoCompleto);
+       
         completeLoaded = true;
         AGM = Algoritmos.AGM(grafoCompleto);
         aristasAGM = toArista(AGM);
-        aristasClusters = toArista(AGM);
+        aristasClusters = (ArrayList<Arista>) aristasAGM.clone();
         agmLoaded = true;
-        this.render(miMapa);
+        Menu.setProgress("",100);
+ 
     }
 
 
@@ -137,10 +142,17 @@ public class GrafoJmap extends Thread{
                 Arista arista = new Arista(cor1, cor2);
                 if (!ret.contains(arista)) {
                     ret.add(arista);
+                    aristas++;
+                    
+              
                 }
             }
+            Menu.setProgress("Generando Aristas...",(i*100)/gp.vertices());
+            
+            
+            
         }
-
+          
         return ret;
     }
 
@@ -150,6 +162,7 @@ public class GrafoJmap extends Thread{
             for (int j = 0; j < list.size(); j++) {
                 if (i != j)
                     grafo.agregarArista(i, j, distFrom(list.get(i), list.get(j)));
+                Menu.setProgress("Cargando Grafo...",(i*100)/list.size());
             }
         }
         return grafo;

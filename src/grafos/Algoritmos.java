@@ -1,5 +1,7 @@
 package grafos;
 
+import gui.Menu;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +17,8 @@ public class Algoritmos
 			Arista a = menorArista(grafo, visitados); // De un amarillo a un negro
 			GRAFO.agregarArista(a.origen, a.destino, a.peso);
 			visitados.add(a.destino);
+			Menu.setProgress("Calculando AGM...",(i*100)/grafo.vertices()-1);
+		
 		}
 		
 		return GRAFO;
