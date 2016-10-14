@@ -444,12 +444,22 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         if (e.getSource() == aplicarButton) {
 
 
-            String n = JOptionPane.showInputDialog(this, "Ingrese la cantidad de clusters");
-            if(isNumeroValido(n)){
 
-                clusterInput = Integer.parseInt(n);
+            if(intelliRadio.isSelected()){
                 miMapa.removeAllMapMarkers();
                 miMapa.removeAllMapPolygons();
+                modoCluster = Cluster.INTELIGENTE;
+                JGrafo.changeClusterMode(modoCluster,0);
+                JGrafo.changeMode(GraphType.CLUSTERS);
+                render();
+                return;
+
+            }
+            String n = JOptionPane.showInputDialog(this, "Ingrese la cantidad de clusters");
+           if(isNumeroValido(n)){
+
+                clusterInput = Integer.parseInt(n);
+
 
                 if (maximoRadio.isSelected())
                     modoCluster = Cluster.MAXIMO;
