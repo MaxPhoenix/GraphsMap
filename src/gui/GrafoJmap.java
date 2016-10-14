@@ -6,11 +6,12 @@ import grafos.GrafoPesado;
 import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
-import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Set;
+
+import static gui.GrafoJmap.GraphType.CAMINOMINIMO;
 
 
 /**
@@ -20,37 +21,37 @@ public class GrafoJmap extends Thread{
      FileManager f;
 
     private ArrayList<Coordinate> coordenadas = new ArrayList<>();
-
+    private ArrayList<Arista> aristasCaminoMinimo = new ArrayList<>();
     private ArrayList<Arista> aristasAGM = new ArrayList<>();
     private ArrayList<Arista> aristasCompleto = new ArrayList<>();
     private ArrayList<Arista> aristasClusters = new ArrayList<>();
     private ArrayList<Arista> aristasActuales = new ArrayList<Arista>();  //este swapea entre las distinas opciones de grafo
     private GrafoPesado grafoCompleto;
-    private GrafoPesado AGM;
+    private GrafoPesado AGM,caminoMinimo;
     private JMapViewer miMapa;
     private Double aristas=0D;
+    private int cantClusters=0;
     private Menu menu;
-
     private boolean agmLoaded, completeLoaded;
 
 
 
 
-    public enum GraphType{AGM,COMPLETO,CLUSTERS,NINGUNA;
-    @Override
+    public enum GraphType{AGM,CAMINOMINIMO,COMPLETO,CLUSTERS,NINGUNA;
+
     public String toString(){
     	switch(this){
     	case AGM:return "AGM";
     	case COMPLETO: return "Completo";
     	case CLUSTERS: return "Clusters";
     	case NINGUNA: return "Ninguna";
+        case CAMINOMINIMO: return "CAMINOMINIMO";
     	default: return "Desconocido";
     	}
     }
     }
     public enum Cluster{MAXIMO,PROMEDIO,INTELIGENTE;
     }
-
 
 
 
@@ -61,6 +62,11 @@ public class GrafoJmap extends Thread{
     public ArrayList<Arista> getAristasAGM() {
         return aristasAGM;
     }
+
+    public String getCantClusters() {
+        return Integer.toString(cantClusters);
+    }
+
 
     public ArrayList<Coordinate> getCoordenadas (){ return coordenadas;}
 
@@ -107,6 +113,12 @@ public class GrafoJmap extends Thread{
         if(!isInterrupted())
             AGM = Algoritmos.AGM(grafoCompleto,menu);
         if(!isInterrupted())
+            caminoMinimo=Algoritmos.CaminoMinimo(grafoCompleto,menu,0);
+
+
+        if(!isInterrupted())
+            aristasCaminoMinimo=toArista(caminoMinimo);
+        if(!isInterrupted())
             aristasAGM = toArista(AGM);
         else{
             return;
@@ -137,14 +149,23 @@ public class GrafoJmap extends Thread{
 
 //ahora render dibuja las aristas en base al modo ya cambiado anteriormente
     public void render() {
-        Color color = Color.RED;
+        if(coordenadas!=null) {
 
-        for (Coordinate c : coordenadas) {
-            MapMarker nuevoMarker = new MapMarkerDot(c);
-            nuevoMarker.getStyle().setBackColor(color);
-            miMapa.addMapMarker(nuevoMarker);
+            Color color = Color.GREEN;
+                for (int i = 0; i < coordenadas.size() ; i++) {
+                    if(i>0)
+                        color=Color.RED;
+                    else{color=Color.GREEN;}
+                    Coordinate actual = coordenadas.get(i);
+                    MapMarkerDot nuevoMarker = new MapMarkerDot(actual);
+                    nuevoMarker.getStyle().setBackColor(color);
+                    miMapa.addMapMarker(nuevoMarker);
+
+                }
+
+
+
         }
-
         for (Arista v : this.aristasActuales)
             v.render(miMapa);
 
@@ -208,7 +229,13 @@ public class GrafoJmap extends Thread{
         if(cantClusters > aristasAGM.size())
             throw new IllegalArgumentException("argumento mayor a la cant aristas");
 
-        aristasClusters= (ArrayList<Arista>) aristasAGM.clone();
+        if(menu.Modo==CAMINOMINIMO)
+            aristasClusters = (ArrayList<Arista>) aristasCaminoMinimo.clone();
+
+        else{
+            aristasClusters = (ArrayList<Arista>) aristasAGM.clone();
+        }
+
 
         if(cluster==Cluster.MAXIMO){
             for( int i=0 ; i<cantClusters-1; i++){
@@ -216,10 +243,12 @@ public class GrafoJmap extends Thread{
             }
             System.out.println("Cluster "+cluster);
         }
+        ArrayList<Double> distances = Arista.distances(aristasClusters); //ya ordenada
+        Double promedio = Arista.promedio(distances);
         if(cluster==Cluster.PROMEDIO) {
             for (int i = 0; i < cantClusters - 1; i++) {
-                ArrayList<Double> distances = Arista.distances(aristasClusters); //ya ordenada
-                Double promedio = Arista.promedio(distances);
+
+                promedio = Arista.promedio(distances);
                 Double mediumDistance = Arista.mediumDistance(distances, promedio);
                 aristasClusters.remove(Arista.mediumArista(aristasClusters, mediumDistance));
 
@@ -227,9 +256,21 @@ public class GrafoJmap extends Thread{
             System.out.println("Cluster " + cluster);
         }
 
-
+        this.cantClusters=cantClusters;
         if(cluster==Cluster.INTELIGENTE){
-         //TODO   borrarAristaIntel(this.aristasClusters,cantClusters);
+            Double Peso=0D;
+            for(Arista ar: aristasClusters){
+                Peso+=ar.getPeso();
+            }
+
+
+            int i=0;
+            while(promedio*1.04*(aristasClusters.size()-1)>Peso){
+                i++;
+
+                aristasClusters.remove((Arista.getMax(aristasClusters)));
+            }
+            this.cantClusters=i;
         }
 
         aristasActuales=aristasClusters;
@@ -237,6 +278,8 @@ public class GrafoJmap extends Thread{
     }
 
     //este metodo cambia el modo de grafo entre completo, agm y clusters
+
+
     public void changeMode(GraphType modo){
 
         if(modo == GraphType.AGM) {
@@ -245,6 +288,11 @@ public class GrafoJmap extends Thread{
         }
         else if (modo == GraphType.CLUSTERS) {
         	 this.aristasActuales= aristasClusters;
+        }
+
+        else if(modo == CAMINOMINIMO){
+            this.aristasActuales=aristasCaminoMinimo;
+            System.out.println("camino.");
         }
         else if(modo == GraphType.COMPLETO) {
         	 this.aristasActuales= aristasCompleto;
@@ -255,6 +303,8 @@ public class GrafoJmap extends Thread{
 
 
         System.out.println("Cambio de modo a " + modo );
+
+            this.render();
 
     }
 

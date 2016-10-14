@@ -50,6 +50,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     private boolean edition = false;
     private Integer clusterInput = 0;
     private boolean edited = false;
+    private boolean instanciaVacia=false;
     
 
 
@@ -140,6 +141,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         modeCombo = new JComboBox<String>();
         modeCombo.addItem("Modo: Ninguna");
         modeCombo.addItem("Modo: AGM");
+        modeCombo.addItem("Modo: Camino Goloso");
         modeCombo.addItem("Modo: Completo");
         modeCombo.setBounds(0, 0, 200, 30);
         modeCombo.addActionListener(this);
@@ -183,7 +185,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         frame.add(intelliRadio);
         intelliRadio.setVisible(false);
         intelliRadio.setOpaque(false);
-        intelliRadio.setEnabled(false);
+
 
 
         aplicarButton = new JButton("Aplicar");
@@ -218,7 +220,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
         progressBar.setVisible(false);
-        progressBar.setBounds(this.width/2,this.height/2, 150, 30);
+        progressBar.setBounds((height/2)+30,0, 250, 30);
 
         Container content = frame.getContentPane();
         content.add(progressBar, BorderLayout.NORTH);
@@ -278,22 +280,29 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     @Override
     public void actionPerformed(ActionEvent e) {
 
+        if(e.getSource()==nuevaInstancia) {
+            JGrafo = new GrafoJmap(new ArrayList<Coordinate>(), this);
+            turnInvisible(new Object[]{start, dictarCoords, fileCombo, nuevaInstancia });
+            turnVisible(new Object[]{modeCombo,stadistics,edit});
+            modeCombo.setSelectedIndex(0);
+            edition = true;
+            JOptionPane.showMessageDialog(null, "Entrando en modo edicion. Haga click donde desee ingresar coordenadas.");
+            turnInvisible(new Object[] {edit, modeCombo});
+            noEdit.setVisible(true);
+
+
+        }
+
+
         if (menu) {
 
-        	if(e.getSource()==nuevaInstancia) {
-        	    JGrafo = new GrafoJmap(new ArrayList<Coordinate>(), this);
-        	    edited=true;
-                turnInvisible(new Object[]{start, dictarCoords, fileCombo, nuevaInstancia });
-                turnVisible(new Object[]{modeCombo,stadistics,edit});
-                menu = false;
-        	}
+
 
             if (e.getSource() == start) {
                 if (loadMap()) {
                     exit.setText("Cancel");
                 	modeCombo.setSelectedIndex(0);
                     menu = false;
-
                     turnInvisible(new Object[]{start, dictarCoords, fileCombo, nuevaInstancia });
                     turnVisible(new Object[]{modeCombo,stadistics,edit});
                 }
@@ -358,44 +367,78 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     private void selecciondeModo(ActionEvent e) {
 
         if (e.getSource() == modeCombo) {
-
+            miMapa.removeAllMapMarkers();
+            miMapa.removeAllMapPolygons();
             if ((modeCombo.getSelectedItem().toString().contains("AGM")) && !clusterCheck.isSelected()) {
                 if(!isGraphLoaded()){
-                    JOptionPane.showMessageDialog(this, "no cargo todavia", "Error", JOptionPane.ERROR_MESSAGE);
+                    mostrarMensajeError();
                     modeCombo.setSelectedIndex(0);
                 }
                 else {
-                    miMapa.removeAllMapMarkers();
-                    miMapa.removeAllMapPolygons();
+
                     clusterCheck.setVisible(true);
                     JGrafo.changeMode(GraphType.AGM);
                     Modo = GraphType.AGM;
                 }
-            } else if (modeCombo.getSelectedItem().toString().contains("Completo")) {
+            }
+
+            else if (modeCombo.getSelectedItem().toString().contains("Camino Goloso")) {
+
                 if(!isGraphLoaded()){
-                    JOptionPane.showMessageDialog(this, "no cargo todavia", "Error", JOptionPane.ERROR_MESSAGE);
+                    mostrarMensajeError();
                     modeCombo.setSelectedIndex(0);
                 }
                 else{
-                    miMapa.removeAllMapMarkers();
-                    miMapa.removeAllMapPolygons();
+
+                    clusterCheck.setVisible(false);
+                    clusterCheck.setSelected(false);
+                    Modo = GraphType.CAMINOMINIMO;
+                    JGrafo.changeMode(GraphType.CAMINOMINIMO);
+
+            }
+            }
+
+
+
+
+            else if (modeCombo.getSelectedItem().toString().contains("Completo")) {
+                if(!isGraphLoaded()){
+                    mostrarMensajeError();
+                    modeCombo.setSelectedIndex(0);
+                }
+                else{
+
                     clusterCheck.setVisible(false);
                     clusterCheck.setSelected(false);
                     JGrafo.changeMode(GraphType.COMPLETO);
                     Modo = GraphType.COMPLETO;
                 }
-            } else if (modeCombo.getSelectedItem().toString().contains("Ninguna")) {
-                miMapa.removeAllMapMarkers();
-                miMapa.removeAllMapPolygons();
+            }
+
+
+
+
+            else if (modeCombo.getSelectedItem().toString().contains("Ninguna")) {
+
                 clusterCheck.setVisible(false);
                 clusterCheck.setSelected(false);
                 JGrafo.changeMode(GraphType.NINGUNA);
                 Modo = GraphType.NINGUNA;
             }
+
         }
 
         if(e.getSource() == stadistics){
-            JOptionPane.showMessageDialog(null,"Modo : \n"+ Modo + "\nCantidad de Vertices:\n"+JGrafo.getCoordenadas().size()+ "\nCantidad de Aristas:\n"+ JGrafo.getAristasActuales().size() + "\n Cantidad de clusters : \n"+ clusterInput);
+            int cant= 0;
+            double pesoTot=0;
+            for(Arista ar : JGrafo.getAristasActuales()) {
+                cant++;
+                pesoTot+=ar.getPeso()*1000;
+            }
+
+
+            JOptionPane.showMessageDialog(null,"Modo : \n"+ Modo + "\nPeso del Grafo:\n"+pesoTot +"\nCantidad de Aristas:\n"+cant+ "\nCantidad de Vertices:\n"+JGrafo.getCoordenadas().size()+
+                    "\nCantidad de Aristas:\n"+ JGrafo.getAristasActuales().size() + "\n Cantidad de clusters : \n"+ JGrafo.getCantClusters());
         }
 
         if (e.getSource() == aplicarButton) {
@@ -413,7 +456,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 else if (promedioRadio.isSelected())
                     modoCluster = Cluster.PROMEDIO;
                 else if(intelliRadio.isSelected()){
-                    //TODO modocluster = Cluster.INTELIGENTE;
+                    modoCluster = Cluster.INTELIGENTE;
                 }
                 else{
                     modoCluster =null;
@@ -426,11 +469,14 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 }
             }
 
+                render();
+
+            return;
         }
 
         if(e.getSource() == edit) {
 
-            indexCombo = modeCombo.getSelectedIndex();
+
             modeCombo.setSelectedIndex(0);
             edition = true;
             JOptionPane.showMessageDialog(null, "Entrando en modo edicion. Haga click donde desee ingresar coordenadas.");
@@ -440,7 +486,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         }
 
 
-        JGrafo.render();
+
 
 
         if(e.getSource() == noEdit){
@@ -459,11 +505,20 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
     }
 
-private void render(){
-    if(JGrafo.getCoordenadas().size()>0)
-        miMapa.setDisplayPositionByLatLon(JGrafo.getCoordenadas().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
-    JGrafo.render();
+    private void mostrarMensajeError(){
+        JOptionPane.showMessageDialog(this, "no cargo todavia", "Error", JOptionPane.ERROR_MESSAGE);
+    }
 
+
+private void render(){
+
+    if(JGrafo.isInterrupted()) {
+        JGrafo.render();
+
+        if (JGrafo.getCoordenadas().size() > 0)
+            miMapa.setDisplayPositionByLatLon(JGrafo.getCoordenadas().get(0).getLat(), JGrafo.getCoordenadas().get(0).getLon(), 11);
+
+    }
 }
 
     private boolean isGraphLoaded(){
@@ -554,7 +609,7 @@ private void render(){
 
                 fileManager.setCordinates(fileManager.retrieveCoordinates());
                 JGrafo = new GrafoJmap(fileManager,this);
-                //JGrafo.render(miMapa);
+
                 miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
             }
         }
@@ -615,13 +670,14 @@ private void render(){
         progressBar.setVisible(true);
         if(p==100){
             progressBar.setVisible(false);
-            frame.setTitle("TPJmapViewer");
+            frame.setTitle("TPJmapViewer:  "+this.fileCombo.getSelectedItem());
             exit.setText("Exit");
             if(!JGrafo.isInterrupted()){
                 JGrafo.interrupt();
             }
             if(JGrafo.isInterrupted()){
                 render();
+
             }
             return;
         }
@@ -742,7 +798,7 @@ private void render(){
 
                 if(edition == true) {
                     JGrafo.getCoordenadas().add(miMapa.getPosition(e.getPoint()));
-                    JGrafo.render();
+                   render();
                     edited = true;
                 }
             }
@@ -772,4 +828,7 @@ private void render(){
     public JProgressBar getBar() {
         return progressBar;}
 
+    public void setCantClusters(int cantClusters) {
+        this.clusterInput=-cantClusters;
+    }
 }
