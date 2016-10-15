@@ -24,14 +24,10 @@ import static javax.swing.JOptionPane.*;
  */
 public class Menu extends JMapViewer implements ActionListener, ChangeListener, MouseListener {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private JFrame frame;
 	private JComboBox<String> fileCombo, modeCombo;
     private int indexCombo;
-    // private final ButtonGroup grupo = new ButtonGroup();
     private JCheckBox clusterCheck;
     private JRadioButton intelliRadio, maximoRadio, promedioRadio;
     private static JProgressBar progressBar;
@@ -43,21 +39,19 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     private FileManager fileManager;
     private String loadingStatus="";
     private int width = 1280, height = width / 12 * 9;
-    private boolean menu = true; //para que no sea expandible la ventana
+    private boolean menu = true;
     private static GrafoJmap JGrafo;
     private ArrayList<Coordinate> fileCoordinates;
     private int projectDirectorySize = 0;
     private boolean edition = false;
     private Integer clusterInput = 0;
     private boolean edited = false;
-    private boolean instanciaVacia=false;
 
 
 
 	public Menu() {
         try {
-            UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
             //esta es la carpeta con istancias del proyecto
             projectDirectory = new File("Archivos");
@@ -67,14 +61,12 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
             //aca se crea una carpeta en el home directory del usuario para guardar sus propias instancias
             String separator = File.separator;
-            String currentUsersHomeDir = System.getProperty("user.home"); //C\Users\ "Nombre del usuario
+            String currentUsersHomeDir = System.getProperty("user.home"); //C\Users\ "Nombre del usuario"
             userFolder = new File(currentUsersHomeDir + separator + "Archivos User");
             if (!userFolder.exists()) {
                 userFolder.mkdir();   //crea el directorio de archivos
             }
-
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
         initialize();
     }
 
@@ -84,22 +76,19 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         try {
             frame.setIconImage(ImageIO.read(new File("librerias/map.png")));
         }
-
         catch (IOException exc) {
             exc.printStackTrace();
         }
+
         frame.setLocationRelativeTo(null);
         frame.setBounds(100, 100, width, height);
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
-
 
         miMapa = new JMapViewer();
         miMapa.setZoomContolsVisible(false);
         miMapa.setDisplayPositionByLatLon(-34.521, -58.7008, 11);
         frame.setContentPane(miMapa);
-
 
         start = new JButton("Start");
         start.setBounds(205, 0, 100, 30);
@@ -116,12 +105,10 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         dictarCoords.addActionListener(this);
         frame.add(dictarCoords);
 
-
         nuevaInstancia = new JButton("Nueva Instancia");
         nuevaInstancia.setBounds(0, 35, 200, 30);
         nuevaInstancia.addActionListener(this);
         frame.add(nuevaInstancia);
-        
 
         fileCombo = new JComboBox<String>();
         fileCombo.setBounds(0, 0, 200, 30);
@@ -129,8 +116,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         addFilestoComboBox();
         frame.add(fileCombo);
 
-
-        //////////////////////////////////
 
         modeCombo = new JComboBox<String>();
         modeCombo.addItem("Modo: Ninguna");
@@ -144,7 +129,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         modeCombo.setSelectedItem("Modo: Ninguna");
 
 
-        int offset = width / 10; //45
+        int offset = width / 10;
         clusterCheck = new JCheckBox("Cluster");
         clusterCheck.setBounds(width / 6, 0, 90, 30);
         clusterCheck.addChangeListener(this);
@@ -255,17 +240,16 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
         if (e.getSource() instanceof JRadioButton) {
             JRadioButton button = (JRadioButton) e.getSource();
+
             if (((JRadioButton) e.getSource()).isSelected()) {
+
                 ArrayList<JRadioButton> link = new ArrayList<>();
-
                 link.add(maximoRadio);
-
                 link.add(promedioRadio);
-
                 link.add(intelliRadio);
-
                 link.remove((button));
                 button.setSelected(true);
+
                 for (JRadioButton j : link)
                     j.setSelected(false);
             }
@@ -290,7 +274,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 String ubicacion = guardarCoordClickeadas();
                 fileManager = new FileManager(userFolder.getAbsolutePath()+ubicacion);
                 fileManager.setCordinates(fileManager.retrieveCoordinates());
-                JGrafo= new GrafoJmap(fileManager,this);
+                JGrafo = new GrafoJmap(fileManager,this);
                 fileCombo.setSelectedItem(ubicacion);
                 edition = false;
                 e.setSource(start);
@@ -312,7 +296,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             if (e.getSource() == dictarCoords) {
                 if (createMap()) {
                     menu = false;
-                    frame.setResizable(true);
                     turnInvisible(new Object[]{start, dictarCoords, fileCombo,stadistics});
                     turnVisible(new Object[]{modeCombo,edit});
                 }
@@ -325,7 +308,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         else {
             selecciondeModo(e);
             if (e.getSource() == exit) {
-                if(edited == true){
+                if(edited){
                     guardarCoordClickeadas();
                 }
                 JGrafo.interrupt();
@@ -350,9 +333,8 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         String ubicacion="";
         if(!menu){
             int saveOption = JOptionPane.showConfirmDialog(this,"Se han detectado cambios en la instancia, desea guardarlos?","Cambios", YES_NO_OPTION);
-                if (saveOption == YES_OPTION) {
-                    ubicacion = archivoDeInstanciasClickeadas();
-                }
+            if (saveOption == YES_OPTION)
+                ubicacion = archivoDeInstanciasClickeadas();
             else if (saveOption == NO_OPTION || saveOption == CLOSED_OPTION)
                 JOptionPane.showMessageDialog(this, "No se guardaron las instancias", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -393,20 +375,17 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             }
 
             else if (modeCombo.getSelectedItem().toString().contains("Camino Goloso")) {
-
                 if(!isGraphLoaded()){
                     mostrarMensajeError();
                     modeCombo.setSelectedIndex(0);
                 }
                 else{
-
                     clusterCheck.setVisible(false);
                     clusterCheck.setSelected(false);
                     Modo = GraphType.CAMINOMINIMO;
                     JGrafo.changeMode(GraphType.CAMINOMINIMO);
                 }
             }
-
 
             else if (modeCombo.getSelectedItem().toString().contains("Completo")) {
                 if(!isGraphLoaded()){
@@ -421,14 +400,12 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 }
             }
 
-
             else if (modeCombo.getSelectedItem().toString().contains("Ninguna")) {
                 clusterCheck.setVisible(false);
                 clusterCheck.setSelected(false);
                 JGrafo.changeMode(GraphType.NINGUNA);
                 Modo = GraphType.NINGUNA;
             }
-
         }
 
 
@@ -472,10 +449,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                     modoCluster =null;
                 }
                 try{
-                    /*
-                    miMapa.removeAllMapMarkers();
-                    miMapa.removeAllMapPolygons();
-                    */
                     JGrafo.changeClusterMode(modoCluster, clusterInput);
                     JGrafo.changeMode(GraphType.CLUSTERS);
 
@@ -484,8 +457,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 }
             }
 
-                render();
-
+            render();
             return;
         }
 
@@ -495,7 +467,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             JOptionPane.showMessageDialog(null, "Entrando en modo edicion. Haga click donde desee ingresar coordenadas.");
             turnInvisible(new Object[] {edit, modeCombo});
             noEdit.setVisible(true);
-
         }
 
 
@@ -527,7 +498,6 @@ private void render(){
 
         if (JGrafo.getCoordenadas().size() > 0)
             miMapa.setDisplayPositionByLatLon(JGrafo.getCoordenadas().get(0).getLat(), JGrafo.getCoordenadas().get(0).getLon(), 11);
-
     }
 }
 
@@ -571,15 +541,13 @@ private void render(){
             return false;
         }
         else {
-        	//TODO CREAR UN ARCHIVO VACIO
             String cant = (showInputDialog(this, "cuantas ingresas?"));
-
             if(cant == null || !isInteger(cant)){
                 JOptionPane.showMessageDialog(this, "Ingrese un numero valido de coordenadas, debe ser entero y positivo", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
-            cantCoordenadas = Integer.parseInt(cant);
 
+            cantCoordenadas = Integer.parseInt(cant);
             if(cantCoordenadas <= 0)
                 return false;
 
@@ -598,11 +566,9 @@ private void render(){
                         JOptionPane.showMessageDialog(this, "Cancelo la operacion vuelva a crear archivo","Error", JOptionPane.ERROR_MESSAGE);
                         return false;
                     }
-
-
                     userCoordinates.add(c);
                 }
-                //arreglo de coordinates para guradar
+                //arreglo de coordinates para guardar
                 fileCoordinates = new ArrayList<Coordinate>(cantCoordenadas);
                 for (Coordenada cor : userCoordinates)
                     fileCoordinates.add(new Coordinate(cor.getLat(), cor.getLon()));
@@ -610,7 +576,6 @@ private void render(){
                 //crea un filemanager que guarda como coordinates el arreglo de coordenada creado arriba
                 fileManager = new FileManager(userFolder.getAbsolutePath() + "\\" + nombre);
                 fileManager.setCordinates(fileCoordinates);
-                //cambie la funcion store coordinates para que guarde un directorio
                 fileManager.storeCoordinates();
 
                 fileManager.setCordinates(fileManager.retrieveCoordinates());
@@ -623,35 +588,28 @@ private void render(){
     }
 
     private boolean loadMap() {
-
         String opcion = (String) fileCombo.getSelectedItem();
         int opIndex= fileCombo.getSelectedIndex();
         String fileDir ="";
+        File dir;
+
         if(opIndex <= 0) {
             JOptionPane.showMessageDialog(this, "No se ha cargado ningun archivo", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        if(opIndex < projectDirectorySize+1) {
-            File dir = new File(projectDirectory.getAbsolutePath());
-            if(dir.isDirectory()){
-                for(File f: dir.listFiles()){
-                    if(f.getName().equals(opcion))
-                        fileDir =  f.getAbsolutePath();
-                }
-                opcion = fileDir;
+        if(opIndex < projectDirectorySize+1)
+            dir = new File(projectDirectory.getAbsolutePath());
+        else
+            dir = new File(userFolder.getAbsolutePath());
+
+        if(dir.isDirectory()){
+            for(File f: dir.listFiles()){
+                if(f.getName().equals(opcion))
+                    fileDir =  f.getAbsolutePath();
             }
+            opcion = fileDir;
         }
-        else {
-            File dir = new File(userFolder.getAbsolutePath());
-            if(dir.isDirectory()){
-                for(File f: dir.listFiles()){
-                    if(f.getName().equals(opcion)){
-                        fileDir =  f.getAbsolutePath();
-                    }
-                }
-                opcion = fileDir;
-            }
-        }
+
         fileManager = new FileManager(opcion);
         fileManager.setCordinates(fileManager.retrieveCoordinates());
         
@@ -661,7 +619,6 @@ private void render(){
         }
         
         JGrafo = new GrafoJmap(fileManager,this);
-
         return true;
     }
 
@@ -681,14 +638,12 @@ private void render(){
             }
             if(JGrafo.isInterrupted()){
                 render();
-
             }
             return;
         }
         progressBar.setString(titulo);
         progressBar.setValue(p);
         frame.setTitle("TPJmapViewer:    "+titulo+" "+p+"%");
-
 
     }
 
@@ -781,8 +736,6 @@ private void render(){
         return false;
     }
 
-
-
     private String saveChanges(String nombre){
         //arreglo de coordinates para guradar
         fileCoordinates = JGrafo.getCoordenadas();
@@ -799,7 +752,6 @@ private void render(){
 	public void mouseClicked(java.awt.event.MouseEvent e) {
 		if(!menu || menu){
             if (e.getButton() == 1) {
-
                 if(edition == true) {
                     JGrafo.getCoordenadas().add(miMapa.getPosition(e.getPoint()));
                     render();
@@ -807,7 +759,6 @@ private void render(){
                 }
             }
 		}
-
 	}
 
 	@Override

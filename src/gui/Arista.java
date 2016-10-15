@@ -111,7 +111,6 @@ public class Arista {
 
             if (AyBsoniguales || AyBsonSimilares)
                 return true;
-
         }
         return false;
     }
@@ -126,21 +125,8 @@ public class Arista {
         coordenadas2.add(a);
         coordenadas2.add(b);
         coordenadas2.add(a);
-       // coordenadas2.add(b);
 
         MapPolygon polygon = new MapPolygonImpl(coordenadas2);
-       // Graphics g=miMapa.getGraphics();
-       // Point p1=miMapa.getMapPosition(a);
-       // Point p2=miMapa.getMapPosition(b);
-
-        //ArrayList<Coordinate> COR=new ArrayList<Coordinate>();
-       // ArrayList<Point> pt=new ArrayList<Point>();
-     //   pt.add(p1);
-      //  pt.add(p2);
-       // COR.add(a);
-       // COR.add(b);
-      //  MyMapMarkerArrow arrow=new MyMapMarkerArrow(COR);
-      //  arrow.paint(g,pt);
 
         miMapa.addMapPolygon(polygon);
 

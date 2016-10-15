@@ -37,23 +37,22 @@ public class GrafoJmap extends Thread{
 
 
 
-    public enum GraphType{AGM,CAMINOMINIMO,COMPLETO,CLUSTERS,NINGUNA;
+    public enum GraphType{
+        AGM,CAMINOMINIMO,COMPLETO,CLUSTERS,NINGUNA;
 
-    public String toString(){
-    	switch(this){
-    	case AGM:return "AGM";
-    	case COMPLETO: return "Completo";
-    	case CLUSTERS: return "Clusters";
-    	case NINGUNA: return "Ninguna";
-        case CAMINOMINIMO: return "CAMINOMINIMO";
-    	default: return "Desconocido";
-    	}
-    }
-    }
-    public enum Cluster{MAXIMO,PROMEDIO,INTELIGENTE;
+        public String toString(){
+    	    switch(this){
+    	    case AGM:return "AGM";
+    	    case COMPLETO: return "Completo";
+    	    case CLUSTERS: return "Clusters";
+    	    case NINGUNA: return "Ninguna";
+            case CAMINOMINIMO: return "CAMINOMINIMO";
+    	    default: return "Desconocido";
+    	    }
+        }
     }
 
-
+    public enum Cluster{MAXIMO,PROMEDIO,INTELIGENTE; }
 
     public GrafoPesado getGrafoCompleto() {
         return grafoCompleto;
@@ -73,7 +72,6 @@ public class GrafoJmap extends Thread{
     public boolean isAgmLoaded(){ return agmLoaded;}
 
 
-
     public GrafoJmap(FileManager f, Menu men) {
         this.f = f;
         this.miMapa=men.getMiMapa();
@@ -82,26 +80,23 @@ public class GrafoJmap extends Thread{
         this.start();
 
     }
+
     public GrafoJmap(ArrayList<Coordinate> bkp, Menu men) {
         this.coordenadas=bkp;
         this.miMapa=men.getMiMapa();
         this.menu=men;
         this.start();
-
     }
-
 
     public GrafoJmap(FileManager f) {
         this.f = f;
         this.coordenadas = f.getCordinates();
         this.start();
-
     }
 
     @SuppressWarnings("unchecked")
 	public void run(){
     	menu.setProgress("Cargando Coordenadas",0);
-
 
         if(!isInterrupted())
             grafoCompleto = toGrafo(coordenadas);
@@ -112,7 +107,6 @@ public class GrafoJmap extends Thread{
             AGM = Algoritmos.AGM(grafoCompleto,menu);
         if(!isInterrupted())
             caminoMinimo=Algoritmos.CaminoMinimo(grafoCompleto,menu,0);
-
 
         if(!isInterrupted())
             aristasCaminoMinimo=toArista(caminoMinimo);
@@ -143,29 +137,22 @@ public class GrafoJmap extends Thread{
         return ret;
     }
 
-//ahora render dibuja las aristas en base al modo ya cambiado anteriormente
+
     public void render() {
         if(coordenadas!=null) {
-
             Color color = Color.GREEN;
-                for (int i = 0; i < coordenadas.size() ; i++) {
-                    if(i>0)
-                        color=Color.RED;
-                    else{color=Color.GREEN;}
-                    Coordinate actual = coordenadas.get(i);
-                    MapMarkerDot nuevoMarker = new MapMarkerDot(actual);
-                    nuevoMarker.getStyle().setBackColor(color);
-                    miMapa.addMapMarker(nuevoMarker);
-
-                }
-
-
-
+            for (int i = 0; i < coordenadas.size() ; i++) {
+                if(i>0) {color=Color.RED;}
+                else {color=Color.GREEN;}
+                Coordinate actual = coordenadas.get(i);
+                MapMarkerDot nuevoMarker = new MapMarkerDot(actual);
+                nuevoMarker.getStyle().setBackColor(color);
+                miMapa.addMapMarker(nuevoMarker);
+            }
         }
         for (Arista v : this.aristasActuales)
             v.render(miMapa);
-
-}
+    }
 
     public ArrayList<Arista> toArista(GrafoPesado gp) {
         ArrayList<Arista> ret = new ArrayList<Arista>(gp.vertices());
@@ -177,7 +164,6 @@ public class GrafoJmap extends Thread{
             for (Integer j : vecinos) {
                 if(isInterrupted()){
                     this.interrupt();
-
                     return new ArrayList<Arista>();
                 }
                 Coordinate cor2 = coordenadas.get(j);
@@ -189,9 +175,6 @@ public class GrafoJmap extends Thread{
             }
 
             menu.setProgress("Generando Aristas...",(i*100)/gp.vertices());
-            
-            
-            
         }
           
         return ret;
@@ -207,12 +190,10 @@ public class GrafoJmap extends Thread{
             for (int j = i; j < list.size(); j++) {
                 if (i != j)
                     grafo.agregarArista(i, j, distFrom(list.get(i), list.get(j)));
-
             }
             menu.setProgress("Cargando Grafo...",(i*100)/list.size());
         }
         return grafo;
-
     }
 
     public ArrayList<Arista> getAristasActuales() {
@@ -231,22 +212,20 @@ public class GrafoJmap extends Thread{
             aristasClusters = (ArrayList<Arista>) aristasAGM.clone();
         }
 
-
         if(cluster==Cluster.MAXIMO){
             for( int i=0 ; i<cantClusters-1; i++){
               aristasClusters.remove((Arista.getMax(aristasClusters)));
             }
             System.out.println("Cluster "+cluster);
         }
+
         ArrayList<Double> distances = Arista.distances(aristasClusters); //ya ordenada
         Double promedio = Arista.promedio(distances);
         if(cluster==Cluster.PROMEDIO) {
             for (int i = 0; i < cantClusters - 1; i++) {
-
                 promedio = Arista.promedio(distances);
                 Double mediumDistance = Arista.mediumDistance(distances, promedio);
                 aristasClusters.remove(Arista.mediumArista(aristasClusters, mediumDistance));
-
             }
             System.out.println("Cluster " + cluster);
         }
@@ -257,8 +236,6 @@ public class GrafoJmap extends Thread{
             for(Arista ar: aristasClusters){
                 Peso+=ar.getPeso();
             }
-
-
             int i=0;
             while(promedio*1.04*(aristasClusters.size()-1)>Peso){
                 i++;

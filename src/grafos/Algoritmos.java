@@ -19,7 +19,6 @@ public class Algoritmos
 			visitados.add(a.destino);
 			if(i%2==0)
 				Menu.setProgress("Calculando AGM...",(i*100)/grafo.vertices()-1);
-
 		}
 		
 		return GRAFO;
@@ -27,7 +26,7 @@ public class Algoritmos
 
 	public static GrafoPesado CaminoMinimo (GrafoPesado G, Menu Menu, Integer origen){
 		Set<Integer> visitados = new HashSet<Integer>();
-     //   Set<Integer> Novisitados = new HashSet<Integer>();
+     //  Set<Integer> Novisitados = new HashSet<Integer>();
 
         GrafoPesado Graf = new GrafoPesado(G.vertices());
 		visitados.add(origen);
@@ -79,9 +78,6 @@ public class Algoritmos
 			return this.origen.hashCode() + this.destino.hashCode();
 		}
 	}
-
-
-
 
 		// Retorna la arista de menor peso entre un vertice amarillo y uno no amarillo
 		static Arista menorArista(GrafoPesado grafo,Integer actual,Set<Integer> visitados ){

@@ -14,14 +14,11 @@ import java.util.List;
  */
 
 public class FileManager implements Serializable {
-    /**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	String nombre;
 	boolean archivoCorrupto=false;
     private ArrayList<Coordinate> cor = new ArrayList<>();
-
 
     public String getNombre() {
         return nombre;
@@ -35,13 +32,11 @@ public class FileManager implements Serializable {
         return cor;
     }
 
-
     public void setCor(ArrayList<Coordinate> cor) {
         this.cor = cor;
     }
 
     public FileManager(String fileName) {
-
         nombre = fileName;
     }
 
@@ -50,7 +45,7 @@ public class FileManager implements Serializable {
         ArrayList<Coordinate> coordenadas = new ArrayList<>();
         File f = new File(fileName);
         try{
-            if(f.exists() == true ) {
+            if(f.exists()) {
                 Type tipoCoordenada = new TypeToken<List<Coordenada>>() {}.getType();
                 List<Coordenada> coordenada = gson.fromJson(new FileReader(fileName), tipoCoordenada);
                 if (coordenada == null)
@@ -79,7 +74,7 @@ public class FileManager implements Serializable {
         ArrayList<Coordinate> coordenadas = new ArrayList<>();
         File f = new File(this.nombre);
         try{
-            if(f.exists() == true ) {
+            if(f.exists()  ) {
                 Type tipoCoordenada = new TypeToken<List<Coordenada>>() {}.getType();
                 List<Coordenada> coordenada;
                 try{
@@ -92,7 +87,6 @@ public class FileManager implements Serializable {
                 }
                 if (coordenada == null)
                     System.out.println("Archivo vacio, creando uno nuevo...");
-     
                 
                 else
                     for (Coordenada c : coordenada)
