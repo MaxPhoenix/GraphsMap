@@ -271,7 +271,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         if(e.getSource() == noEdit) {
             if (menu) {
                 JOptionPane.showMessageDialog(null, "Finalizando modo edicion");
-                String ubicacion = guardarCoordClickeadas();
+                String ubicacion = maybeSaveInputCoordinates();
                 fileManager = new FileManager(userFolder.getAbsolutePath()+ubicacion);
                 fileManager.setCordinates(fileManager.retrieveCoordinates());
                 JGrafo = new GrafoJmap(fileManager,this);
@@ -308,9 +308,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         else {
             selecciondeModo(e);
             if (e.getSource() == exit) {
-                if(edited){
-                    guardarCoordClickeadas();
-                }
+
                 JGrafo.interrupt();
                 setProgress("Interrupted",100);
                 menu = true;
@@ -324,27 +322,32 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 clusterInput = 0;
                 Modo = GraphType.NINGUNA;
                 modoCluster = Cluster.INTELIGENTE;
+                if(edited){
+                    maybeSaveInputCoordinates();
+                }
 
             }
         }
     }
 
-    private String guardarCoordClickeadas() {
+    private String maybeSaveInputCoordinates() {
         String ubicacion="";
         if(!menu){
             int saveOption = JOptionPane.showConfirmDialog(this,"Se han detectado cambios en la instancia, desea guardarlos?","Cambios", YES_NO_OPTION);
             if (saveOption == YES_OPTION)
-                ubicacion = archivoDeInstanciasClickeadas();
+                ubicacion = SaveInputCoordinates();
             else if (saveOption == NO_OPTION || saveOption == CLOSED_OPTION)
                 JOptionPane.showMessageDialog(this, "No se guardaron las instancias", "Error", JOptionPane.ERROR_MESSAGE);
+                edited = false;
+
         }
         else{
-           ubicacion = archivoDeInstanciasClickeadas();
+            SaveInputCoordinates();
         }
         return ubicacion;
     }
 
-    private String archivoDeInstanciasClickeadas(){
+    private String SaveInputCoordinates(){
         String name = JOptionPane.showInputDialog(this, "Ingrese el nombre del archivo a guardar", "File Name")+".json";
         while (isInvalidName(name)) {
             JOptionPane.showMessageDialog(this, "no es un nombre valido", "Error", JOptionPane.ERROR_MESSAGE);
@@ -382,8 +385,8 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 else{
                     clusterCheck.setVisible(false);
                     clusterCheck.setSelected(false);
-                    Modo = GraphType.CAMINOMINIMO;
-                    JGrafo.changeMode(GraphType.CAMINOMINIMO);
+                    Modo = GraphType.CAMINOGOLOSO;
+                    JGrafo.changeMode(GraphType.CAMINOGOLOSO);
                 }
             }
 
@@ -488,12 +491,11 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
 private void render(){
 
-    if(menu || !menu)
-        if(edition)
-            JGrafo.render();
 
 
-    if(JGrafo.isInterrupted()) {
+
+    if(JGrafo.isInterrupted()|| JGrafo.isLoaded()) {
+
         JGrafo.render();
 
         if (JGrafo.getCoordenadas().size() > 0)
@@ -502,7 +504,7 @@ private void render(){
 }
 
     private boolean isGraphLoaded(){
-        boolean condition1 = JGrafo.isAgmLoaded();
+        boolean condition1 = JGrafo.isLoaded();
         boolean condition2 = true;
         return (condition1 && condition2);
     }
@@ -627,20 +629,46 @@ private void render(){
         return miMapa;
     }
 
+
+
+
+
     public void setProgress(String titulo, int p){
-        progressBar.setVisible(true);
-        if(p==100){
-            progressBar.setVisible(false);
+
+        if(JGrafo.isLoaded()){
+
+
             frame.setTitle("TPJmapViewer:  "+this.fileCombo.getSelectedItem());
+
             exit.setText("Exit");
+
             if(!JGrafo.isInterrupted()){
                 JGrafo.interrupt();
+
             }
-            if(JGrafo.isInterrupted()){
-                render();
+
+
+
+
+            turnVisible(new Object[]{modeCombo,stadistics});
+            if (!edition) {
+                turnVisible(new Object[]{edit});
             }
+
+            progressBar.setVisible(false);
+
+            if(clusterCheck.isSelected()){
+                turnInvisible(new Object[]{clusterCheck,intelliRadio, promedioRadio,maximoRadio});
+            }
+
+            modeCombo.setSelectedIndex(0);
+
             return;
         }
+       // edition=false;
+        progressBar.setVisible(true);
+        turnInvisible(new Object[]{modeCombo, clusterCheck,intelliRadio, promedioRadio,maximoRadio,stadistics,edit });
+        turnUnselected(new JRadioButton[]{intelliRadio, promedioRadio,maximoRadio});
         progressBar.setString(titulo);
         progressBar.setValue(p);
         frame.setTitle("TPJmapViewer:    "+titulo+" "+p+"%");
@@ -656,6 +684,15 @@ private void render(){
         }
     }
 
+
+    private void turnUnselected(JRadioButton[] obj){
+        for(Object object: obj){
+            if (object instanceof JRadioButton){
+                JRadioButton j=(JRadioButton)object;
+                j.setSelected(true);
+            }
+        }
+    }
     private void turnInvisible(Object [] obj){
         for(Object object: obj){
             if (object instanceof JComponent){

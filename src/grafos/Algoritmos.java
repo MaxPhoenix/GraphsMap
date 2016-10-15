@@ -26,7 +26,11 @@ public class Algoritmos
 
 	public static GrafoPesado CaminoMinimo (GrafoPesado G, Menu Menu, Integer origen){
 		Set<Integer> visitados = new HashSet<Integer>();
-     //  Set<Integer> Novisitados = new HashSet<Integer>();
+	/*	Set<Integer> Novisitados = new HashSet<Integer>();
+		for(int x=0; x<G.vertices();x++){
+			Novisitados.add(x);
+		}*/
+
 
         GrafoPesado Graf = new GrafoPesado(G.vertices());
 		visitados.add(origen);
@@ -36,8 +40,8 @@ public class Algoritmos
             visitados.add(men.destino);
             Graf.agregarArista(men.destino,men.origen,men.peso);
             actual=men.destino;
-         //   Novisitados.remove(men);
-			Menu.setProgress("Calculando Camino Minimo...",(visitados.size()*100)/G.vertices()-1);
+         //	Novisitados.remove(men);
+			Menu.setProgress("Calculando Camino Goloso...",(visitados.size()*100)/G.vertices()-1);
 
 		}
 		return Graf;
