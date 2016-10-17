@@ -259,29 +259,38 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        if(e.getSource() == nuevaInstancia){
-            JGrafo = new GrafoJmap(new ArrayList<Coordinate>(), this);
-            turnInvisible(new Object[]{start, dictarCoords, fileCombo, nuevaInstancia,edit,stadistics,modeCombo });
-            turnVisible(new Object[]{noEdit});
-            JOptionPane.showMessageDialog(null, "Entrando en modo edicion. Haga click donde desee ingresar coordenadas.");
-            edition = true;
-        }
-
-
         if(e.getSource() == noEdit) {
             if (menu) {
                 JOptionPane.showMessageDialog(null, "Finalizando modo edicion");
                 String ubicacion = maybeSaveInputCoordinates();
-                fileManager = new FileManager(userFolder.getAbsolutePath()+ubicacion);
-                fileManager.setCordinates(fileManager.retrieveCoordinates());
-                JGrafo = new GrafoJmap(fileManager,this);
-                fileCombo.setSelectedItem(ubicacion);
-                edition = false;
-                e.setSource(start);
-                noEdit.setVisible(false);
+                if(ubicacion == null){
+                    JOptionPane.showMessageDialog(this, "cancelo la creacrion del archivo", "Error", JOptionPane.ERROR_MESSAGE);
+                    turnVisible(new Object[]{start,fileCombo,nuevaInstancia,dictarCoords});
+                    turnInvisible(new Object[]{modeCombo,stadistics,noEdit});
+                }
+                else {
+                    fileManager = new FileManager(userFolder.getAbsolutePath() + ubicacion);
+                    fileManager.setCordinates(fileManager.retrieveCoordinates());
+                    JGrafo = new GrafoJmap(fileManager, this);
+                    fileCombo.setSelectedItem(ubicacion);
+                    edition = false;
+                    e.setSource(start);
+                    noEdit.setVisible(false);
+
+                }
             }
         }
         if (menu) {
+
+            if(e.getSource() == nuevaInstancia){
+                JOptionPane.showMessageDialog(null, "Entrando en modo edicion. Haga click donde desee ingresar coordenadas.");
+                JGrafo = new GrafoJmap(new ArrayList<Coordinate>(), this);
+                turnInvisible(new Object[]{start, dictarCoords, fileCombo, nuevaInstancia,edit});
+                modeCombo.setVisible(false);
+                stadistics.setVisible(false);
+                turnVisible(new Object[]{noEdit});
+                edition = true;
+            }
 
             if (e.getSource() == start) {
                 if (loadMap()) {
@@ -296,7 +305,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             if (e.getSource() == dictarCoords) {
                 if (createMap()) {
                     menu = false;
-                    turnInvisible(new Object[]{start, dictarCoords, fileCombo,stadistics});
+                    turnInvisible(new Object[]{start, dictarCoords, fileCombo,stadistics,nuevaInstancia});
                     turnVisible(new Object[]{modeCombo,edit});
                 }
             }
@@ -308,7 +317,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         else {
             selecciondeModo(e);
             if (e.getSource() == exit) {
-
                 JGrafo.interrupt();
                 setProgress("Interrupted",100);
                 menu = true;
@@ -323,6 +331,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 Modo = GraphType.NINGUNA;
                 modoCluster = Cluster.INTELIGENTE;
                 if(edited){
+                    menu = false;
                     maybeSaveInputCoordinates();
                 }
 
@@ -333,6 +342,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     private String maybeSaveInputCoordinates() {
         String ubicacion="";
         if(!menu){
+
             int saveOption = JOptionPane.showConfirmDialog(this,"Se han detectado cambios en la instancia, desea guardarlos?","Cambios", YES_NO_OPTION);
             if (saveOption == YES_OPTION)
                 ubicacion = SaveInputCoordinates();
@@ -342,7 +352,8 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
         }
         else{
-            SaveInputCoordinates();
+           ubicacion= SaveInputCoordinates();
+
         }
         return ubicacion;
     }
@@ -352,6 +363,10 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         while (isInvalidName(name)) {
             JOptionPane.showMessageDialog(this, "no es un nombre valido", "Error", JOptionPane.ERROR_MESSAGE);
             name = JOptionPane.showInputDialog(this, "Ingrese el nombre del archivo a guardar", "File Name")+".json";
+        }
+
+        if(name.equals("null.json")){
+            return null;
         }
         String ubicacion = saveChanges(name);
         edited = false;
@@ -410,7 +425,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 Modo = GraphType.NINGUNA;
             }
         }
-
 
         if(e.getSource() == stadistics){
             int cant= 0;
@@ -490,9 +504,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
 
 
 private void render(){
-
-
-
 
     if(JGrafo.isInterrupted()|| JGrafo.isLoaded()) {
 
@@ -630,9 +641,6 @@ private void render(){
     }
 
 
-
-
-
     public void setProgress(String titulo, int p){
 
         if(JGrafo.isLoaded()){
@@ -646,9 +654,6 @@ private void render(){
                 JGrafo.interrupt();
 
             }
-
-
-
 
             turnVisible(new Object[]{modeCombo,stadistics});
             if (!edition) {
@@ -665,7 +670,7 @@ private void render(){
 
             return;
         }
-       // edition=false;
+
         progressBar.setVisible(true);
         turnInvisible(new Object[]{modeCombo, clusterCheck,intelliRadio, promedioRadio,maximoRadio,stadistics,edit });
         turnUnselected(new JRadioButton[]{intelliRadio, promedioRadio,maximoRadio});
