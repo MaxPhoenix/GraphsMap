@@ -509,7 +509,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     }
 
     private void mostrarMensajeError(){
-        JOptionPane.showMessageDialog(this, "no cargo todavia", "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "No cargo todavia", "Error", JOptionPane.ERROR_MESSAGE);
     }
 
 
@@ -531,19 +531,19 @@ private void render(){
     private boolean isNumeroValido(String n){
         
         if(n == null){
-            JOptionPane.showMessageDialog(this, "No ha seleccionado nada", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "No se ha seleccionado nada", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
         if(!isInteger(n) || n.equals("")){
-            JOptionPane.showMessageDialog(this, "Solo se permiten digitos para la creacion de clusters", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Solo se permiten NUMEROS para la creacion de clusters", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
         if (isInteger(n)) {
             Integer input = Integer.parseInt(n);
             if(input <= 1){
-                JOptionPane.showMessageDialog(this, "Pueden haber como minimo 2 clusters", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Ingrese 2 clusters a dividir como minimo", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         }
