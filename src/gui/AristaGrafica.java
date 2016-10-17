@@ -10,11 +10,11 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class AristaGrafica {
+ class AristaGrafica {
     private Coordinate a, b;
 
 
-    public AristaGrafica(Coordinate a, Coordinate b) {
+     AristaGrafica(Coordinate a, Coordinate b) {
         if (a == null || b == null )
             throw new RuntimeException("Null cordinate");
 
@@ -23,7 +23,7 @@ public class AristaGrafica {
 
     }
 
-    public static AristaGrafica getMax(ArrayList <AristaGrafica> list){
+    static AristaGrafica getMax(ArrayList <AristaGrafica> list){
     	
     	Coordinate cor=new Coordinate(1,1);
     	AristaGrafica max=new AristaGrafica (cor,cor);
@@ -39,7 +39,7 @@ public class AristaGrafica {
     }
 
     //un arreglo con todas las distancias del grafo
-    public static ArrayList<Double> distances(ArrayList<AristaGrafica> list){
+     static ArrayList<Double> distances(ArrayList<AristaGrafica> list){
         ArrayList<Double> distances = new ArrayList<> (list.size ());
         distances.addAll (list.stream ().map (AristaGrafica::getPeso).collect (Collectors.toList ()));
         Collections.sort(distances);
@@ -47,7 +47,7 @@ public class AristaGrafica {
     }
 
     // busca un promedio estimativo entre las distancias
-    public static Double promedio(ArrayList<Double> list){
+     static Double promedio(ArrayList<Double> list){
         Double promedio;
         Double suma = 0.0;
         double cant = list.size();
@@ -79,11 +79,11 @@ public class AristaGrafica {
     }
 
     // metodo wrapper del anterior
-    public static Double mediumDistance(ArrayList<Double> list, Double promedio){
+     static Double mediumDistance(ArrayList<Double> list, Double promedio){
         return mediumDistance(list,promedio, 0, list.size()-1);
     }
     //una vez obtenido el promedio busca la arista correspondiente a esa distancia
-    public static AristaGrafica mediumArista(ArrayList<AristaGrafica> list, Double distance){
+     static AristaGrafica mediumArista(ArrayList<AristaGrafica> list, Double distance){
         for(AristaGrafica aristaGrafica : list){
             if(aristaGrafica.getPeso() == distance)
                 return aristaGrafica;
@@ -91,7 +91,7 @@ public class AristaGrafica {
         return null;
     }
 
-    public double getPeso (){
+     double getPeso (){
     	return GrafoJmap.distFrom(this.a,this.b);
     	
     }
@@ -120,7 +120,7 @@ public class AristaGrafica {
         return a.hashCode() + b.hashCode();
     }
 
-    public void render(JMapViewer miMapa) {
+     void render(JMapViewer miMapa) {
         ArrayList<Coordinate> coordenadas2 = new ArrayList<> ();
         coordenadas2.add(a);
         coordenadas2.add(b);

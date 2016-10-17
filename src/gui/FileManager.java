@@ -19,17 +19,17 @@ class FileManager implements Serializable {
     private ArrayList<Coordinate> cor = new ArrayList<>();
 
 
-    public void setCor(ArrayList<Coordinate> cor) {
+     void setCor(ArrayList<Coordinate> cor) {
         this.cor = cor;
     }
 
-    public FileManager(String fileName) {
+    FileManager(String fileName) {
         nombre = fileName;
     }
 
 
 
-    public ArrayList<Coordinate> retrieveCoordinates() {
+    ArrayList<Coordinate> retrieveCoordinates() {
         Gson gson = new Gson();
         ArrayList<Coordinate> coordenadas = new ArrayList<>();
         File f = new File(this.nombre);
@@ -68,16 +68,13 @@ class FileManager implements Serializable {
     }
 
 
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
 
-    public boolean isArchivoCorrupto() {
+     boolean isArchivoCorrupto() {
         return archivoCorrupto;
     }
 
 
-    public void storeCoordinates() {
+     void storeCoordinates() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         ArrayList<Coordenada> storage = new ArrayList<> ();
 
@@ -98,11 +95,11 @@ class FileManager implements Serializable {
 
     }
 
-    public void setCordinates(ArrayList<Coordinate> cordinates) {
+     void setCordinates(ArrayList<Coordinate> cordinates) {
         this.cor = cordinates;
     }
 
-    public ArrayList<Coordinate> getCordinates() {
+     ArrayList<Coordinate> getCordinates() {
         return cor;
     }
 }

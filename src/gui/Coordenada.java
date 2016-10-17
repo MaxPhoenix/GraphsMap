@@ -9,19 +9,19 @@ class Coordenada implements Serializable {
     private Double latitud;
     private Double longitud;
 
-    public Coordenada(){
+     Coordenada(){
 
     }
-    public Coordenada(double lat, double lon) {
+     Coordenada(double lat, double lon) {
         this.latitud = lat;
         this.longitud = lon;
     }
 
-    public Double getLat() {
+     Double getLat() {
         return this.latitud;
     }
 
-    public Double getLon() {
+     Double getLon() {
         return this.longitud;
     }
 
