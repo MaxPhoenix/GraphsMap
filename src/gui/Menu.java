@@ -336,8 +336,11 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 Modo = GraphType.NINGUNA;
                 modoCluster = Cluster.INTELIGENTE;
                 if(edited){
-                    menu = false;
                     maybeSaveInputCoordinates();
+                    edited = false;
+                    edition=false;
+                    menu = true;
+
                 }
 
             }
@@ -353,7 +356,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 ubicacion = SaveInputCoordinates();
             else if (saveOption == NO_OPTION || saveOption == CLOSED_OPTION)
                 JOptionPane.showMessageDialog(this, "No se guardaron las instancias", "Error", JOptionPane.ERROR_MESSAGE);
-                edited = false;
+
 
         }
         else{
@@ -374,7 +377,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             return null;
         }
         String ubicacion = saveChanges(name);
-        edited = false;
+
         addFilestoComboBox();
         return ubicacion;
     }
@@ -434,7 +437,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         if(e.getSource() == stadistics){
             int cant= 0;
             double pesoTot=0;
-            for(Arista ar : JGrafo.getAristasActuales()) {
+            for(AristaGrafica ar : JGrafo.getAristasActuales()) {
                 cant++;
                 pesoTot+=ar.getPeso()*1000;
             }

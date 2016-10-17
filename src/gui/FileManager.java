@@ -8,15 +8,16 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 
 class FileManager implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	private final String nombre;
-	private boolean archivoCorrupto=false;
+    private static final long serialVersionUID = 1L;
+    private final String nombre;
+    private boolean archivoCorrupto=false;
     private ArrayList<Coordinate> cor = new ArrayList<>();
+
 
     public void setCor(ArrayList<Coordinate> cor) {
         this.cor = cor;
@@ -37,18 +38,19 @@ class FileManager implements Serializable {
                 Type tipoCoordenada = new TypeToken<List<Coordenada>>() {}.getType();
                 List<Coordenada> coordenada;
                 try{
-                coordenada = gson.fromJson(new FileReader(this.nombre), tipoCoordenada);}
+                    coordenada = gson.fromJson(new FileReader(this.nombre), tipoCoordenada);}
                 catch(Exception e){
-                	 System.out.println("Archivo corrupto, generando instancia vacia");
-                	  archivoCorrupto=true;
-                	return coordenadas;
-                	
+                    System.out.println("Archivo corrupto, generando instancia vacia");
+                    archivoCorrupto=true;
+                    return coordenadas;
+
                 }
                 if (coordenada == null)
                     System.out.println("Archivo vacio, creando uno nuevo...");
-                
+
                 else
-                    coordenadas.addAll (coordenada.stream ().map (c -> new Coordinate (c.getLat (), c.getLon ())).collect (Collectors.toList ()));
+                    for (Coordenada c : coordenada)
+                        coordenadas.add(new Coordinate(c.getLat(), c.getLon()));
             }
             else{
                 //ESTO ES PARA QUE, SI EL ARCHIVO NO EXISTE, SE CREA UNO VACIO, QUE DESPUES SE MODIFICA SEGUN LO QUE GUARDE EL USUARIO
@@ -66,9 +68,13 @@ class FileManager implements Serializable {
     }
 
 
+    public static long getSerialversionuid() {
+        return serialVersionUID;
+    }
+
     public boolean isArchivoCorrupto() {
-		return archivoCorrupto;
-	}
+        return archivoCorrupto;
+    }
 
 
     public void storeCoordinates() {
@@ -76,7 +82,8 @@ class FileManager implements Serializable {
         ArrayList<Coordenada> storage = new ArrayList<> ();
 
         //conversion de coordinate a coordaenada
-        storage.addAll (this.cor.stream ().map (c -> new Coordenada (c.getLat (), c.getLon ())).collect (Collectors.toList ()));
+        for(Coordinate c : this.cor)
+            storage.add(new Coordenada(c.getLat(),c.getLon()));
 
         String coordenadas = gson.toJson(storage);  //guardado de coordenada
 

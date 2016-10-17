@@ -22,11 +22,11 @@ public class GrafoJmap extends Thread{
      FileManager f;
 
     private ArrayList<Coordinate> coordenadas = new ArrayList<>();
-    private ArrayList<Arista> aristasCaminoMinimo = new ArrayList<>();
-    private ArrayList<Arista> aristasAGM = new ArrayList<>();
-    private ArrayList<Arista> aristasCompleto = new ArrayList<>();
-    private ArrayList<Arista> aristasClusters = new ArrayList<>();
-    private ArrayList<Arista> aristasActuales = new ArrayList<Arista>();  //este swapea entre las distinas opciones de grafo
+    private ArrayList<AristaGrafica> aristasCaminoMinimo = new ArrayList<>();
+    private ArrayList<AristaGrafica> aristasAGM = new ArrayList<>();
+    private ArrayList<AristaGrafica> aristasCompleto = new ArrayList<>();
+    private ArrayList<AristaGrafica> aristasClusters = new ArrayList<>();
+    private ArrayList<AristaGrafica> aristasActuales = new ArrayList<AristaGrafica>();  //este swapea entre las distinas opciones de grafo
     private GrafoPesado grafoCompleto;
     private GrafoPesado AGM,caminoMinimo;
     private JMapViewer miMapa;
@@ -57,7 +57,7 @@ public class GrafoJmap extends Thread{
         return grafoCompleto;
     }
 
-    public ArrayList<Arista> getAristasAGM() {
+    public ArrayList<AristaGrafica> getAristasAGM() {
         return aristasAGM;
     }
 
@@ -115,7 +115,7 @@ public class GrafoJmap extends Thread{
             return;
         }
 
-        aristasClusters = (ArrayList<Arista>) aristasAGM.clone();
+        aristasClusters = (ArrayList<AristaGrafica>) aristasAGM.clone();
         Loaded = true;
 
         menu.setProgress("Completado",100);
@@ -151,12 +151,12 @@ public class GrafoJmap extends Thread{
                 miMapa.addMapMarker(nuevoMarker);
             }
         }
-        for (Arista v : this.aristasActuales)
+        for (AristaGrafica v : this.aristasActuales)
             v.render(miMapa);
     }
 
-    private ArrayList<Arista> toArista(GrafoPesado gp) {
-        ArrayList<Arista> ret = new ArrayList<Arista>(gp.vertices());
+    private ArrayList<AristaGrafica> toArista(GrafoPesado gp) {
+        ArrayList<AristaGrafica> ret = new ArrayList<AristaGrafica>(gp.vertices());
 
         for (int i = 0; i < gp.vertices(); i++) {
             Set<Integer> vecinos = gp.vecinos(i);
@@ -165,12 +165,12 @@ public class GrafoJmap extends Thread{
             for (Integer j : vecinos) {
                 if(isInterrupted()){
                     this.interrupt();
-                    return new ArrayList<Arista>();
+                    return new ArrayList<AristaGrafica>();
                 }
                 Coordinate cor2 = coordenadas.get(j);
-                Arista arista = new Arista(cor1, cor2);
-                if (!ret.contains(arista)) {
-                    ret.add(arista);
+                AristaGrafica aristaGrafica = new AristaGrafica (cor1, cor2);
+                if (!ret.contains(aristaGrafica)) {
+                    ret.add(aristaGrafica);
                     aristas++;
                 }
             }
@@ -195,7 +195,7 @@ public class GrafoJmap extends Thread{
         return grafo;
     }
 
-    public ArrayList<Arista> getAristasActuales() {
+    public ArrayList<AristaGrafica> getAristasActuales() {
         return aristasActuales;
     }
 
@@ -205,26 +205,26 @@ public class GrafoJmap extends Thread{
             throw new IllegalArgumentException("argumento mayor a la cant aristas");
 
         if(menu.Modo== CAMINOGOLOSO)
-            aristasClusters = (ArrayList<Arista>) aristasCaminoMinimo.clone();
+            aristasClusters = (ArrayList<AristaGrafica>) aristasCaminoMinimo.clone();
 
         else{
-            aristasClusters = (ArrayList<Arista>) aristasAGM.clone();
+            aristasClusters = (ArrayList<AristaGrafica>) aristasAGM.clone();
         }
 
         if(cluster==Cluster.MAXIMO){
             for( int i=0 ; i<cantClusters-1; i++){
-              aristasClusters.remove((Arista.getMax(aristasClusters)));
+              aristasClusters.remove((AristaGrafica.getMax(aristasClusters)));
             }
             System.out.println("Cluster "+cluster);
         }
 
-        ArrayList<Double> distances = Arista.distances(aristasClusters); //ya ordenada
-        Double promedio = Arista.promedio(distances);
+        ArrayList<Double> distances = AristaGrafica.distances(aristasClusters); //ya ordenada
+        Double promedio = AristaGrafica.promedio(distances);
         if(cluster==Cluster.PROMEDIO) {
             for (int i = 0; i < cantClusters - 1; i++) {
-                promedio = Arista.promedio(distances);
-                Double mediumDistance = Arista.mediumDistance(distances, promedio);
-                aristasClusters.remove(Arista.mediumArista(aristasClusters, mediumDistance));
+                promedio = AristaGrafica.promedio(distances);
+                Double mediumDistance = AristaGrafica.mediumDistance(distances, promedio);
+                aristasClusters.remove(AristaGrafica.mediumArista(aristasClusters, mediumDistance));
             }
             System.out.println("Cluster " + cluster);
         }
@@ -232,14 +232,14 @@ public class GrafoJmap extends Thread{
         this.cantClusters=cantClusters;
         if(cluster==Cluster.INTELIGENTE){
             Double Peso=0D;
-            for(Arista ar: aristasClusters){
+            for(AristaGrafica ar: aristasClusters){
                 Peso+=ar.getPeso();
             }
             int i=0;
             while(promedio*1.04*(aristasClusters.size()-1)>Peso){
                 i++;
 
-                aristasClusters.remove((Arista.getMax(aristasClusters)));
+                aristasClusters.remove((AristaGrafica.getMax(aristasClusters)));
             }
             this.cantClusters=i;
         }

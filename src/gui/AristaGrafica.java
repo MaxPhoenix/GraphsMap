@@ -10,11 +10,11 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Arista {
+public class AristaGrafica {
     private Coordinate a, b;
 
 
-    public Arista(Coordinate a, Coordinate b) {
+    public AristaGrafica(Coordinate a, Coordinate b) {
         if (a == null || b == null )
             throw new RuntimeException("Null cordinate");
 
@@ -23,25 +23,25 @@ public class Arista {
 
     }
 
-    public static Arista getMax(ArrayList <Arista> list){
+    public static AristaGrafica getMax(ArrayList <AristaGrafica> list){
     	
     	Coordinate cor=new Coordinate(1,1);
-    	Arista max=new Arista(cor,cor);
+    	AristaGrafica max=new AristaGrafica (cor,cor);
     
-    	Arista aux=null;
-    	for (Arista arista: list){
-    		if(arista.getPeso ()>max.getPeso()){
-    			aux=arista;
-    			max=arista;
+    	AristaGrafica aux=null;
+    	for (AristaGrafica aristaGrafica : list){
+    		if(aristaGrafica.getPeso ()>max.getPeso()){
+    			aux= aristaGrafica;
+    			max= aristaGrafica;
     		}
     	}
     	return aux;
     }
 
     //un arreglo con todas las distancias del grafo
-    public static ArrayList<Double> distances(ArrayList<Arista> list){
+    public static ArrayList<Double> distances(ArrayList<AristaGrafica> list){
         ArrayList<Double> distances = new ArrayList<> (list.size ());
-        distances.addAll (list.stream ().map (Arista::getPeso).collect (Collectors.toList ()));
+        distances.addAll (list.stream ().map (AristaGrafica::getPeso).collect (Collectors.toList ()));
         Collections.sort(distances);
         return distances;
     }
@@ -83,10 +83,10 @@ public class Arista {
         return mediumDistance(list,promedio, 0, list.size()-1);
     }
     //una vez obtenido el promedio busca la arista correspondiente a esa distancia
-    public static Arista mediumArista(ArrayList<Arista> list, Double distance){
-        for(Arista arista: list){
-            if(arista.getPeso() == distance)
-                return arista;
+    public static AristaGrafica mediumArista(ArrayList<AristaGrafica> list, Double distance){
+        for(AristaGrafica aristaGrafica : list){
+            if(aristaGrafica.getPeso() == distance)
+                return aristaGrafica;
         }
         return null;
     }
@@ -104,8 +104,8 @@ public class Arista {
         if (obj == null)
             return false;
 
-        if (obj instanceof Arista) {
-            Arista ar = (Arista) obj;
+        if (obj instanceof AristaGrafica) {
+            AristaGrafica ar = (AristaGrafica) obj;
             boolean AyBsoniguales = this.a.equals(ar.a) && this.b.equals(ar.b);
             boolean AyBsonSimilares = this.a.equals(ar.b) && this.b.equals(ar.a);
 
