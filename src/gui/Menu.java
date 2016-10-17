@@ -260,13 +260,18 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     public void actionPerformed(ActionEvent e) {
 
         if(e.getSource() == noEdit) {
+
             if (menu) {
                 JOptionPane.showMessageDialog(null, "Finalizando modo edicion");
                 String ubicacion = maybeSaveInputCoordinates();
+
                 if(ubicacion == null){
+                    edition = false;
                     JOptionPane.showMessageDialog(this, "cancelo la creacrion del archivo", "Error", JOptionPane.ERROR_MESSAGE);
                     turnVisible(new Object[]{start,fileCombo,nuevaInstancia,dictarCoords});
                     turnInvisible(new Object[]{modeCombo,stadistics,noEdit});
+                    miMapa.removeAllMapMarkers();
+                    miMapa.removeAllMapPolygons();
                 }
                 else {
                     fileManager = new FileManager(userFolder.getAbsolutePath() + ubicacion);
@@ -286,6 +291,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 JOptionPane.showMessageDialog(null, "Entrando en modo edicion. Haga click donde desee ingresar coordenadas.");
                 JGrafo = new GrafoJmap(new ArrayList<Coordinate>(), this);
                 turnInvisible(new Object[]{start, dictarCoords, fileCombo, nuevaInstancia,edit});
+                edit.setVisible(false);
                 modeCombo.setVisible(false);
                 stadistics.setVisible(false);
                 turnVisible(new Object[]{noEdit});
@@ -449,31 +455,33 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                 render();
                 return;
             }
-
+//
             String n = JOptionPane.showInputDialog(this, "Ingrese la cantidad de clusters");
-           if(isNumeroValido(n)){
+            if((n.length() > 6))
+                JOptionPane.showMessageDialog(this, "no se puede dividir el grafo en mas grupos que aristas", "Error", JOptionPane.ERROR_MESSAGE);
+            else {
+                if (isNumeroValido(n)) {
 
-                clusterInput = Integer.parseInt(n);
+                    clusterInput = Integer.parseInt(n);
 
-                if (maximoRadio.isSelected())
-                    modoCluster = Cluster.MAXIMO;
-                else if (promedioRadio.isSelected())
-                    modoCluster = Cluster.PROMEDIO;
-                else if(intelliRadio.isSelected()){
-                    modoCluster = Cluster.INTELIGENTE;
-                }
-                else{
-                    modoCluster =null;
-                }
-                try{
-                    JGrafo.changeClusterMode(modoCluster, clusterInput);
-                    JGrafo.changeMode(GraphType.CLUSTERS);
+                    if (maximoRadio.isSelected())
+                        modoCluster = Cluster.MAXIMO;
+                    else if (promedioRadio.isSelected())
+                        modoCluster = Cluster.PROMEDIO;
+                    else if (intelliRadio.isSelected()) {
+                        modoCluster = Cluster.INTELIGENTE;
+                    } else {
+                        modoCluster = null;
+                    }
+                    try {
+                        JGrafo.changeClusterMode(modoCluster, clusterInput);
+                        JGrafo.changeMode(GraphType.CLUSTERS);
 
-                }catch (IllegalArgumentException exception){
-                    JOptionPane.showMessageDialog(this, "no se puede dividir el grafo en mas grupos que aristas", "Error", JOptionPane.ERROR_MESSAGE);
+                    } catch (IllegalArgumentException exception) {
+                        JOptionPane.showMessageDialog(this, "no se puede dividir el grafo en mas grupos que aristas", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
-
             render();
             return;
         }
@@ -555,7 +563,7 @@ private void render(){
         }
         else {
             String cant = (showInputDialog(this, "cuantas ingresas?"));
-            if(cant == null || !isInteger(cant)){
+            if(cant == null || !isInteger(cant) || cant.equals("")){
                 JOptionPane.showMessageDialog(this, "Ingrese un numero valido de coordenadas, debe ser entero y positivo", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
