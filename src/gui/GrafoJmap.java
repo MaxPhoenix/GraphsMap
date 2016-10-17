@@ -17,6 +17,7 @@ import static gui.GrafoJmap.GraphType.CAMINOGOLOSO;
 /**
  * Created by Agus on 28/9/2016.
  */
+@SuppressWarnings("ALL")
 public class GrafoJmap extends Thread{
      FileManager f;
 
@@ -32,9 +33,7 @@ public class GrafoJmap extends Thread{
     private Double aristas=0D;
     private int cantClusters=0;
     private Menu menu;
-    private boolean Loaded, completeLoaded;
-
-
+    private boolean Loaded;
 
 
     public enum GraphType{
@@ -52,7 +51,7 @@ public class GrafoJmap extends Thread{
         }
     }
 
-    public enum Cluster{MAXIMO,PROMEDIO,INTELIGENTE; }
+    public enum Cluster{MAXIMO,PROMEDIO,INTELIGENTE}
 
     public GrafoPesado getGrafoCompleto() {
         return grafoCompleto;
@@ -68,13 +67,12 @@ public class GrafoJmap extends Thread{
 
     public ArrayList<Coordinate> getCoordenadas (){ return coordenadas;}
 
-    public boolean isCompleteLoaded(){ return completeLoaded;}
     public boolean isLoaded(){ return Loaded;}
 
 
     public GrafoJmap(FileManager f, Menu men) {
         this.f = f;
-        this.miMapa=men.getMiMapa();
+        this.miMapa= Menu.getMiMapa ();
         this.menu=men;
         this.coordenadas = f.getCordinates();
         this.start();
@@ -83,7 +81,7 @@ public class GrafoJmap extends Thread{
 
     public GrafoJmap(ArrayList<Coordinate> bkp, Menu men) {
         this.coordenadas=bkp;
-        this.miMapa=men.getMiMapa();
+        this.miMapa= Menu.getMiMapa ();
         this.menu=men;
         this.start();
     }
@@ -107,7 +105,7 @@ public class GrafoJmap extends Thread{
         if(!isInterrupted())
             AGM = Algoritmos.AGM(grafoCompleto,menu);
         if(!isInterrupted())
-            caminoMinimo=Algoritmos.CaminoMinimo(grafoCompleto,menu,0);
+            caminoMinimo=Algoritmos.CaminoMinimo(grafoCompleto,menu);
 
         if(!isInterrupted())
             aristasCaminoMinimo=toArista(caminoMinimo);
@@ -130,7 +128,7 @@ public class GrafoJmap extends Thread{
         double ret = 0.0;
         if(cor1.equals(cor2))
             return ret;
-        else if (cor1 == null || cor2 == null)
+        else if (cor2 == null)
             return ret;
         double lat1 = cor1.getLat();
         double lat2 = cor2.getLat();
@@ -143,7 +141,7 @@ public class GrafoJmap extends Thread{
 
     public void render() {
         if(coordenadas!=null) {
-            Color color = Color.GREEN;
+            Color color;
             for (int i = 0; i < coordenadas.size() ; i++) {
                 if(i>0) {color=Color.RED;}
                 else {color=Color.GREEN;}
@@ -157,7 +155,7 @@ public class GrafoJmap extends Thread{
             v.render(miMapa);
     }
 
-    public ArrayList<Arista> toArista(GrafoPesado gp) {
+    private ArrayList<Arista> toArista(GrafoPesado gp) {
         ArrayList<Arista> ret = new ArrayList<Arista>(gp.vertices());
 
         for (int i = 0; i < gp.vertices(); i++) {
@@ -185,7 +183,7 @@ public class GrafoJmap extends Thread{
 
 
 
-    public GrafoPesado toGrafo(ArrayList<Coordinate> list) {
+    private GrafoPesado toGrafo(ArrayList<Coordinate> list) {
         GrafoPesado grafo = new GrafoPesado(list.size());
         for (int i = 0; i < list.size(); i++) {
             for (int j = i; j < list.size(); j++) {

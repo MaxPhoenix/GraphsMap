@@ -3,6 +3,7 @@ package grafos;
 import gui.Menu;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Algoritmos
@@ -10,7 +11,7 @@ public class Algoritmos
 	// Algoritmo de Prim
 	public static GrafoPesado AGM(GrafoPesado grafo,Menu Menu){
 		GrafoPesado GRAFO = new GrafoPesado(grafo.vertices());
-		Set<Integer> visitados = new HashSet<Integer>();
+		Set<Integer> visitados = new HashSet<> ();
 		visitados.add(0); // Cualquiera
 
 		for(int i=0; i<grafo.vertices()-1; ++i){
@@ -24,8 +25,8 @@ public class Algoritmos
 		return GRAFO;
 	}
 
-	public static GrafoPesado CaminoMinimo (GrafoPesado G, Menu Menu, Integer origen){
-		Set<Integer> visitados = new HashSet<Integer>();
+	public static GrafoPesado CaminoMinimo(GrafoPesado G, Menu Menu){
+		Set<Integer> visitados = new HashSet<> ();
 	/*	Set<Integer> Novisitados = new HashSet<Integer>();
 		for(int x=0; x<G.vertices();x++){
 			Novisitados.add(x);
@@ -33,8 +34,8 @@ public class Algoritmos
 
 
         GrafoPesado Graf = new GrafoPesado(G.vertices());
-		visitados.add(origen);
-		int actual=origen;
+		visitados.add(0);
+		int actual= 0;
 		while (visitados.size()<G.vertices()) {
             Arista men=menorArista(G,actual,visitados);
             visitados.add(men.destino);
@@ -51,9 +52,9 @@ public class Algoritmos
 
 	
 	static class Arista {
-		public Integer origen;
-		public Integer destino;
-		public double peso;
+		public final Integer origen;
+		public final Integer destino;
+		public final double peso;
 
 		public Arista(int origen, int destino, double pesoArista) {
 			this.origen = origen;
@@ -71,7 +72,7 @@ public class Algoritmos
 
 			if (obj instanceof Arista) {
 				Arista otra = (Arista) obj;
-				if (origen == otra.origen && destino == otra.destino)
+				if (Objects.equals (origen, otra.origen) && Objects.equals (destino, otra.destino))
 					return true;
 			}
 			return false;
@@ -84,11 +85,11 @@ public class Algoritmos
 	}
 
 		// Retorna la arista de menor peso entre un vertice amarillo y uno no amarillo
-		static Arista menorArista(GrafoPesado grafo,Integer actual,Set<Integer> visitados ){
+		private static Arista menorArista(GrafoPesado grafo, Integer actual, Set<Integer> visitados){
 			Arista ret = new Arista(0, 0, Double.MAX_VALUE);
 
 			for (Integer j : grafo.vecinos(actual)){
-				if( visitados.contains(j) == false ){
+				if(!visitados.contains (j)){
 					if( grafo.getPeso(actual, j) < ret.peso ){
 						ret = new Arista(actual, j, grafo.getPeso(actual, j));
 					}
@@ -103,7 +104,7 @@ public class Algoritmos
 
 			for(Integer i: visitados)
 				for (Integer j : grafo.vecinos(i))
-					if( visitados.contains(j) == false ){
+					if(!visitados.contains (j)){
 						if( grafo.getPeso(i, j) < ret.peso )
 							ret = new Arista(i, j, grafo.getPeso(i, j));
 					}

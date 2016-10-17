@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Grafo
+class Grafo
 {
 	private ArrayList<Set<Integer>> vecinos;
 	private int aristas;
@@ -15,10 +15,10 @@ public class Grafo
 		if (n < 0)
 			throw new IllegalArgumentException("cantidad vertices negativo: " + n);
 		
-		vecinos = new ArrayList<Set<Integer>>();
+		vecinos = new ArrayList<> ();
 		vertices = n;
 		for(int i=0; i<n; ++i)
-			vecinos.add( new HashSet<Integer>() );
+			vecinos.add(new HashSet<> () );
 	}
 
 	public int vertices(){
@@ -39,14 +39,14 @@ public class Grafo
 		vecinos.get(j).add(i);
 	}
 
-	public void removerArista(int i, int j){
-		chequearExtremos(i, j);
+	public void removerArista(){
+		chequearExtremos(2, 0);
 
-		if (contieneArista(i,j))
+		if (contieneArista(2, 0))
 			aristas--;
 		
-		vecinos.get(i).remove(j);
-		vecinos.get(j).remove(i);
+		vecinos.get(2).remove(0);
+		vecinos.get(0).remove(2);
 	}
 
 	public boolean contieneArista(int i, int j){
@@ -62,11 +62,7 @@ public class Grafo
 			throw new IllegalArgumentException("No se pueden agregar loops: " + i +" "+j);
 	}
 
-	public int gradoDelVertice(int v){
-		return vecinos.get(v).size();
-	}
-
-	public Set<Integer> vecinos(int v){
+    public Set<Integer> vecinos(int v){
 		return vecinos.get(v); // Taraaan!
 	}
 	

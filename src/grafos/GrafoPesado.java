@@ -4,8 +4,8 @@ import java.util.Set;
 
 public class GrafoPesado
 {
-	private Grafo grafo;
-	private double[][] pesos;
+	private final Grafo grafo;
+	private final double[][] pesos;
 	
 	public GrafoPesado(int n){
 		grafo = new Grafo(n);
@@ -21,15 +21,9 @@ public class GrafoPesado
 	public boolean contieneArista(int i, int j){
 		return grafo.contieneArista(i, j);
 	}
-	
-	public void quitarArista(int i,int j){
-		grafo.removerArista(i, j);
-		pesos[i][j] = 0;
-		pesos[j][i] = 0;
-	}
-	
-	public double getPeso(int i, int j){
-		if( grafo.contieneArista(i, j) == false )
+
+    public double getPeso(int i, int j){
+		if(!grafo.contieneArista (i, j))
 			throw new IllegalArgumentException("Se consulto el peso de una arista inexistente! " + i + ", " + j);
 
 		return pesos[i][j];		
@@ -47,12 +41,8 @@ public class GrafoPesado
 	public Set<Integer> vecinos(int i){
 		return grafo.vecinos(i);
 	}
-	
-	public int cantVertices(){
-		return grafo.cantVertices();
-	}
-	
-	@Override
+
+    @Override
 	public String toString(){
 		return this.grafo.toString();
 	}

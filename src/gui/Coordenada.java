@@ -1,13 +1,13 @@
 package gui;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-/**
- * Created by Agus on 30/9/2016.
- */
+
 class Coordenada implements Serializable {
 	private static  final long serialVersionUID = 1L;
-    Double latitud, longitud;
+    private Double latitud;
+    private Double longitud;
 
     public Coordenada(){
 
@@ -44,15 +44,15 @@ class Coordenada implements Serializable {
                 return false;
             if(this.latitud != null && this.longitud == null && cor2.latitud == null && cor2.longitud != null)
                 return false;
-            if(this.latitud == null && this.longitud == null && cor2.latitud == null && cor2.longitud != null)
+            if(this.latitud == null && this.longitud == null && cor2.latitud == null)
                 return false;
-            if(this.latitud == null && this.longitud == null && cor2.latitud != null && cor2.longitud == null)
+            if(this.latitud == null && this.longitud == null)
                 return false;
-            if(this.latitud == null && this.longitud != null && cor2.latitud == null && cor2.longitud == null)
+            if(this.latitud == null && cor2.latitud == null)
                 return false;
-            if(this.latitud != null && this.longitud == null && cor2.latitud == null && cor2.longitud == null)
+            if(this.latitud != null && this.longitud == null && cor2.latitud == null)
                 return false;
-            if(this.latitud == cor2.latitud && this.longitud == cor2.longitud )
+            if(Objects.equals (this.latitud, cor2.latitud) && Objects.equals (this.longitud, cor2.longitud))
                 return true;
 
         }

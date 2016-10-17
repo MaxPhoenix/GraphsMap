@@ -16,7 +16,7 @@ public class AlgoritmosTest
 	{
 		GrafoPesado grafo = instancia();
 
-		Set<Integer> visitados = new HashSet<Integer>();
+		Set<Integer> visitados = new HashSet<> ();
 		visitados.add(0);
 
 		Algoritmos.Arista arista = Algoritmos.menorArista(grafo, visitados);
@@ -28,7 +28,7 @@ public class AlgoritmosTest
 	{
 		GrafoPesado grafo = instancia();
 
-		Set<Integer> visitados = new HashSet<Integer>();
+		Set<Integer> visitados = new HashSet<> ();
 		visitados.add(0);
 		visitados.add(1);
 		visitados.add(2);

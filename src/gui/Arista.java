@@ -7,6 +7,8 @@ import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Arista {
     private Coordinate a, b;
@@ -38,17 +40,15 @@ public class Arista {
 
     //un arreglo con todas las distancias del grafo
     public static ArrayList<Double> distances(ArrayList<Arista> list){
-        ArrayList<Double> distances = new ArrayList<Double>(list.size());
-        for(Arista arista: list){
-            distances.add(arista.getPeso());
-        }
+        ArrayList<Double> distances = new ArrayList<> (list.size ());
+        distances.addAll (list.stream ().map (Arista::getPeso).collect (Collectors.toList ()));
         Collections.sort(distances);
         return distances;
     }
 
     // busca un promedio estimativo entre las distancias
     public static Double promedio(ArrayList<Double> list){
-        Double promedio =0.0;
+        Double promedio;
         Double suma = 0.0;
         double cant = list.size();
         for(Double d : list){
@@ -59,14 +59,14 @@ public class Arista {
     }
 
     // busca el elemento en el arreglo de distancias mas cercano al promedio (medium)
-    public static Double mediumDistance(ArrayList<Double> doublesList, Double medium, int start, int finish){
+    private static Double mediumDistance(ArrayList<Double> doublesList, Double medium, int start, int finish){
 
        // ejemplo [1,2,3,4,5,6,7,8,9,10] promedio = 5.5;
 
         if(start  == finish || start>finish) //si se encuentran
             return doublesList.get(start);
 
-        if (doublesList.get(start) == medium || doublesList.get(finish) == medium) //el promedio esta en la lista
+        if (Objects.equals (doublesList.get (start), medium) || Objects.equals (doublesList.get (finish), medium)) //el promedio esta en la lista
             return medium;
 
         if(doublesList.get(start) < medium && doublesList.get(finish) > medium) //si esta entre los valores me acerco al medio
@@ -121,7 +121,7 @@ public class Arista {
     }
 
     public void render(JMapViewer miMapa) {
-        ArrayList<Coordinate> coordenadas2 = new ArrayList<Coordinate>();
+        ArrayList<Coordinate> coordenadas2 = new ArrayList<> ();
         coordenadas2.add(a);
         coordenadas2.add(b);
         coordenadas2.add(a);

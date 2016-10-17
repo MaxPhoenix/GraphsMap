@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-/**
- * Created by Max on 9/29/2016.
- */
+
 public class FileManagerTest {
 
 
@@ -34,7 +32,7 @@ public class FileManagerTest {
 
     @Test
     public void storeCoordinates() throws Exception {
-        ArrayList<Coordinate> coordenadas = new ArrayList<Coordinate>();
+        ArrayList<Coordinate> coordenadas = new ArrayList<> ();
         coordenadas.add(new Coordinate(-34.532, -58.7128));
         coordenadas.add(new Coordinate(-34.546, -58.719));
         coordenadas.add(new Coordinate(-34.559, -58.721));
@@ -42,10 +40,10 @@ public class FileManagerTest {
 
         FileManager m = new FileManager("Archivos/test.json");
         m.setCor(coordenadas);
-        m.storeCoordinates("Archivos","test.json");
+        m.storeCoordinates ();
 
         m = new FileManager("Archivos/test.json");
-        ArrayList<Coordinate> test=m.retrieveCoordinates("Archivos/test.json");
+        ArrayList<Coordinate> test = m.retrieveCoordinates ();
 
         assertEquals(coordenadas.toString(),test.toString());
 
@@ -59,6 +57,7 @@ public class FileManagerTest {
             File file = new File("Archivos/test.json");
             file.delete();
         } catch (Exception e) {
+            //noinspection MalformedFormatString
             System.err.format("%s: no such" + " file or directory");
         }
 

@@ -1,10 +1,10 @@
 package grafos;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.util.Set;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class GrafoTest
 {
@@ -46,7 +46,7 @@ public class GrafoTest
 	public void removerAristaTest()
 	{
 		Grafo grafo = caminito();
-		grafo.removerArista(2, 0);
+		grafo.removerArista();
 		
 		assertFalse( grafo.contieneArista(2, 0) );
 		assertTrue( grafo.contieneArista(2, 1) );
@@ -57,9 +57,9 @@ public class GrafoTest
 	public void removerAristaRepetidaTest()
 	{
 		Grafo grafo = caminito();
-		grafo.removerArista(2, 0);
-		grafo.removerArista(2, 0);
-		grafo.removerArista(2, 0);
+		grafo.removerArista();
+		grafo.removerArista();
+		grafo.removerArista();
 		
 		assertFalse( grafo.contieneArista(2, 0) );
 		assertTrue( grafo.contieneArista(2, 1) );
@@ -86,7 +86,7 @@ public class GrafoTest
 		assertEquals(5, grafo.vertices());
 		assertEquals(2, grafo.aristas());		
 		
-		grafo.removerArista(2, 0);
+		grafo.removerArista();
 		
 		assertEquals(5, grafo.vertices());
 		assertEquals(1, grafo.aristas());		

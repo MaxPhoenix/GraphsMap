@@ -37,7 +37,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
     private Cluster modoCluster ;
     private File userFolder, projectDirectory;
     private FileManager fileManager;
-    private String loadingStatus="";
     private int width = 1280, height = width / 12 * 9;
     private boolean menu = true;
     private static GrafoJmap JGrafo;
@@ -70,7 +69,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
         initialize();
     }
 
-    public void initialize() {
+    private void initialize() {
 
         frame = new JFrame("TPJmapViewer");
         try {
@@ -387,7 +386,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             miMapa.removeAllMapMarkers();
             miMapa.removeAllMapPolygons();
             if ((modeCombo.getSelectedItem().toString().contains("AGM")) && !clusterCheck.isSelected()) {
-                if(!isGraphLoaded()){
+                if(isGraphLoaded()){
                     mostrarMensajeError();
                     modeCombo.setSelectedIndex(0);
                 }
@@ -399,7 +398,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             }
 
             else if (modeCombo.getSelectedItem().toString().contains("Camino Goloso")) {
-                if(!isGraphLoaded()){
+                if(isGraphLoaded()){
                     mostrarMensajeError();
                     modeCombo.setSelectedIndex(0);
                 }
@@ -412,7 +411,7 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             }
 
             else if (modeCombo.getSelectedItem().toString().contains("Completo")) {
-                if(!isGraphLoaded()){
+                if(isGraphLoaded()){
                     mostrarMensajeError();
                     modeCombo.setSelectedIndex(0);
                 }
@@ -515,17 +514,15 @@ private void render(){
 
     if(JGrafo.isInterrupted()|| JGrafo.isLoaded()) {
 
-        JGrafo.render();
+        JGrafo.render ();
 
-        if (JGrafo.getCoordenadas().size() > 0)
-            miMapa.setDisplayPositionByLatLon(JGrafo.getCoordenadas().get(0).getLat(), JGrafo.getCoordenadas().get(0).getLon(), 11);
     }
 }
 
     private boolean isGraphLoaded(){
         boolean condition1 = JGrafo.isLoaded();
         boolean condition2 = true;
-        return (condition1 && condition2);
+        return (!condition1 || !condition2);
     }
 
 
@@ -602,7 +599,7 @@ private void render(){
                 fileManager.setCordinates(fileManager.retrieveCoordinates());
                 JGrafo = new GrafoJmap(fileManager,this);
 
-                miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
+                  miMapa.setDisplayPositionByLatLon(fileManager.getCordinates().get(0).getLat(), fileManager.getCordinates().get(0).getLon(), 11);
             }
         }
         return true;
@@ -726,7 +723,7 @@ private void render(){
             value1 = field1.getText();
             value2 = field2.getText();
 
-            if (!onlyNumbers(value1) || !onlyNumbers(value2) || value1.equals("") || value2.equals("")) {
+            if (onlyNumbers(value1) || onlyNumbers(value2) || value1.equals("") || value2.equals("")) {
                 return null;
             }
             else{
@@ -765,13 +762,13 @@ private void render(){
         for(int i = 0 ; i < s.length(); i++){
             if(i != 0 ) {
                 if (s.charAt(i) == '+' || s.charAt(i) == '-')
-                    return false;
+                    return true;
             }
             char c = s.charAt(i);
             if(numbers.indexOf(c) == -1 || nonCharacters.indexOf(c) != -1)
-                return false;
+                return true;
         }
-        return true;
+        return false;
     }
 
     private boolean isInvalidName(String s){
@@ -831,10 +828,4 @@ private void render(){
 		
 	}
 
-    public JProgressBar getBar() {
-        return progressBar;}
-
-    public void setCantClusters(int cantClusters) {
-        this.clusterInput=-cantClusters;
-    }
 }
