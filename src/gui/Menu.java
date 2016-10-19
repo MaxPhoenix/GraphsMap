@@ -324,7 +324,6 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
             if (e.getSource() == exit) {
                 JGrafo.interrupt();
                 setProgress("Interrupted",100);
-                menu = true;
                 Rectangle frameBounds = (frame.getBounds());
                 width = frameBounds.width;
                 height = frameBounds.height;         
@@ -339,10 +338,8 @@ public class Menu extends JMapViewer implements ActionListener, ChangeListener, 
                     maybeSaveInputCoordinates();
                     edited = false;
                     edition=false;
-                    menu = true;
-
                 }
-
+                menu = true;
             }
         }
     }
